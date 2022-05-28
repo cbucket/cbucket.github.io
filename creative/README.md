@@ -23,3 +23,11 @@ Ben Grimer
 ## [Eliza](https://cbucket.github.io/creative/eliza.html)
 
 e.g.  https://cbucket.github.io/creative/eliza.html
+
+## Ideas
+
+The animal.html file found here attempts to use AJAX to loads list of animals.
+This might be difficult with a static website.
+
+An alternative may be to have a text box which shows the list and allows one
+to copy and paste it somewhere. Something to work on ...
