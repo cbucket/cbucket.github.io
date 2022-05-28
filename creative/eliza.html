@@ -1,0 +1,554 @@
+<html>
+<!-- Javascript version of Elisa -->
+<!-- 18/09/13  -->
+<!-- v0.9 25/09/13 -->
+<!-- v1.0 05/10/13 -->
+<!-- bug *** fixed *** 05/10/13 - when in shut up mode (context 2) the reset button does not remove "hit reset to restart" message. -->
+
+<!-- to be continued -->
+
+<head>
+
+<link rel="stylesheet" type="text/css" href="common/creative2.css" />
+<script type="text/javascript" src="common/bas_funcs.js"></script>
+<script>
+
+/* global variables */
+
+  var gReplies =  /* lines 950 to 2060 (total=112) */
+           ["DON'T YOU BELIEVE THAT I CAN*"             // can you (1,3)
+           ,"PERHAPS YOU WOULD LIKE TO BE ABLE TO*"
+           ,"YOU WANT ME TO BE ABLE TO*"
+           ,"PERHAPS YOU DON'T WANT TO*"                // can i (4,2)
+           ,"DO YOU WANT TO BE ABLE TO*"
+           ,"WHAT MAKES YOU THINK I AM*"                // you are / youre (6,4)
+           ,"DOES IT PLEASE YOU TO BELIEVE I AM*"
+           ,"PERHAPS YOU WOULD LIKE TO BE*"
+           ,"DO YOU SOMETIMES WISH YOU WERE*"
+           ,"DON'T YOU REALLY*"                         // do you really (10,4)
+           ,"WHY DON'T YOU*"
+           ,"DO YOU WISH TO BE ABLE TO*"
+           ,"DOES THAT TROUBLE YOU?"
+           ,"TELL ME MORE ABOUT SUCH FEELINGS."         // i feel (14,3)
+           ,"DO YOU OFTEN FEEL*"
+           ,"DO YOU ENJOY FEELING*"
+           ,"DO YOU REALLY BELIEVE I DON'T*"            // why dont you (17,3)
+           ,"PERHAPS IN GOOD TIME I WILL*"
+           ,"DO YOU WANT ME TO*"
+           ,"DO YOU THINK YOU SHOULD BE ABLE TO*"       // why cant i (20,2)
+           ,"WHY CAN'T YOU*"
+           ,"WHY ARE YOU INTERESTED IN WHETHER OR NOT I AM*"   // are you (22,3)
+           ,"WOULD YOU PREFER IF I WERE NOT*"
+           ,"PERHAPS IN YOUR FANTASIES I AM*"
+           ,"HOW DO YOU KNOW YOU CAN'T*"                // i cant (25,3)
+           ,"HAVE YOU TRIED?"
+           ,"PERHAPS YOU CAN NOW*"
+           ,"DID YOU COME TO ME BECAUSE YOU ARE*"       // i am, im (28,4) twice
+           ,"HOW LONG HAVE YOU BEEN*"
+           ,"DO YOU BELIEVE IT IS NORMAL TO BE*"
+           ,"DO YOU ENJOY BEING*"
+           ,"WE WERE DISCUSSING YOU-- NOT ME."          // YOU (32,3)
+           ,"OH, I*"
+           ,"YOU'RE NOT REALLY TALKING ABOUT ME, ARE YOU?"
+           ,"WHAT WOULD IT MEAN TO YOU IF YOU GOT*"     // I WANT (35,5)
+           ,"WHY DO YOU WANT*"
+           ,"SUPPOSE YOU SOON GOT*"
+           ,"WHAT IF YOU NEVER GOT*"
+           ,"I SOMETIMES ALSO WANT*"
+           ,"WHY DO YOU ASK?"                           // "WHAT","HOW","WHO","WHERE"
+           ,"DOES THAT QUESTION INTEREST YOU?"          //   ,"WHEN","WHY" (40,9) * 6
+           ,"WHAT ANSWER WOULD PLEASE YOU THE MOST?"
+           ,"WHAT DO YOU THINK?"
+           ,"ARE SUCH QUESTIONS ON YOUR MIND OFTEN?"
+           ,"WHAT IS IT THAT YOU REALLY WANT TO KNOW?"
+           ,"HAVE YOU ASKED ANYONE ELSE?"
+           ,"HAVE YOU ASKED SUCH QUESTIONS BEFORE?"
+           ,"WHAT ELSE COME TO MIND WHEN YOU ASK THAT?"
+           ,"NAMES DON'T INTEREST ME."                  // NAME 49,2
+           ,"I DON'T CARE ABOUT NAMES-- PLEASE GO ON."   
+           ,"IS THAT THE REAL REASON?"                  // CAUSE 51,4
+           ,"DON'T ANY OTHER REASONS COME TO MIND?"
+           ,"DOES THAT REASON EXPLAIN ANYTHING ELSE?"
+           ,"WHAT OTHER REASONS MIGHT THERE BE?"
+           ,"PLEASE DON'T APOLOGIZE!"                   // SORRY 55,4
+           ,"APOLOGIES ARE NOT NECESSARY."
+           ,"WHAT FEELINGS DO YOU HAVE WHEN YOU APOLOGIZE."
+           ,"DON'T BE SO DEFENSIVE!"
+           ,"WHAT DOES THAT DREAM SUGGEST TO YOU?"      // DREAM 59,4
+           ,"DO YOU DREAM OFTEN?"
+           ,"WHAT PERSONS APPEAR IN YOUR DREAMS?"
+           ,"ARE YOU DISTURBED BY YOUR DREAMS?"
+           ,"HOW DO YOU DO ... PLEASE STATE YOUR PROBLEM."    // HELLO,"HI " 63,1,63,1
+           ,"YOU DON'T SEEM QUITE CERTAIN."             // "MAYBE" 64,5
+           ,"WHY THE UNCERTAIN TONE?"
+           ,"CAN'T YOU BE MORE POSITIVE?"
+           ,"YOU AREN'T SURE?"
+           ,"DON'T YOU KNOW?"
+           ,"ARE YOU SAYING NO JUST TO BE NEGATIVE?"    // " NO" 69,5
+           ,"YOU ARE BEING A BIT NEGATIVE."
+           ,"WHY NOT?"
+           ,"ARE YOU SURE?"
+           ,"WHY NO?"
+           ,"WHY ARE YOU CONCERNED ABOUT MY*"           // ,"YOUR",74,2
+           ,"WHAT ABOUT YOUR OWN*"
+           ,"CAN YOU THINK OF A SPECIFIC EXAMPLE?"      // "ALWAYS" 76,4
+           ,"WHEN?"
+           ,"WHAT ARE YOU THINKING OF?"
+           ,"REALLY, ALWAYS?"
+           ,"DO YOU REALLY THINK SO?"                   // "THINK" 80,3
+           ,"BUT YOU ARE NOT SURE YOU*"
+           ,"DO YOU DOUBT YOU*"
+           ,"IN WHAT WAY?"                              // ALIKE ,83,7
+           ,"WHAT RESEMBLANCE DO YOU SEE?"
+           ,"WHAT DOES THE SIMILARITY SUGGEST TO YOU?"
+           ,"WHAT OTHER CONNECTIONS DO YOU SEE?"
+           ,"COULD THERE REALLY BE SOME CONNECTION?"
+           ,"HOW?"
+           ,"YOU SEEM QUITE POSITIVE."
+           ,"ARE YOU SURE?"                             // YES (90,3)
+           ,"I SEE."
+           ,"I UNDERSTAND."
+           ,"WHY DO YOU BRING UP THE TOPIC OF FRIENDS?" // FRIEND (93,6)
+           ,"DO YOUR FRIENDS WORRY YOU?"
+           ,"DO YOUR FRIENDS PICK ON YOU?"
+           ,"ARE YOU SURE YOU HAVE ANY FRIENDS?"
+           ,"DO YOU IMPOSE ON YOUR FRIENDS?"
+           ,"PERHAPS YOUR LOVE FOR FRIENDS WORRIES YOU."
+           ,"DO COMPUTERS WORRY YOU?"                   // COMPUTER (99,7)
+           ,"ARE YOU TALKING ABOUT ME IN PARTICULAR?"
+           ,"ARE YOU FRIGHTENED BY MACHINES?"
+           ,"WHY DO YOU MENTION COMPUTERS?"
+           ,"WHAT DO YOU THINK MACHINES HAVE TO DO WITH YOUR PROBLEM?"
+           ,"DON'T YOU THINK COMPUTERS CAN HELP PEOPLE?"
+           ,"WHAT IS IT ABOUT MACHINES THAT WORRIES YOU?"
+           ,"SAY, DO YOU HAVE ANY PSYCHOLOGICAL PROBLEMS?"    // nokeyfound (106,6)
+           ,"WHAT DOES THAT SUGGEST TO YOU?"
+           ,"I SEE."
+           ,"I'M NOT SURE I UNDERSTAND YOU FULLY."
+           ,"COME COME ELUCIDATE YOUR THOUGHTS."
+           ,"CAN YOU ELABORATE ON THAT?"
+           ,"THAT IS QUITE INTERESTING"
+           ];
+
+  var gKeywords =  /* lines 790(810) to 860 (total=36) */
+           ["CAN YOU","CAN I","YOU ARE","YOURE","I DONT","I FEEL"
+           ,"WHY DONT YOU","WHY CANT I","ARE YOU","I CANT","I AM","IM "
+           ,"YOU ","I WANT","WHAT","HOW","WHO","WHERE","WHEN","WHY"
+           ,"NAME","CAUSE","SORRY","DREAM","HELLO","HI ","MAYBE"
+           ," NO","YOUR","ALWAYS","THINK","ALIKE","YES","FRIEND"
+           ,"COMPUTER","NOKEYFOUND"
+           ];
+
+  var gConjugations =  /* lines 880 to 910 (total=12) */
+           [" ARE "," AM ","WERE ","WAS "," YOU "," I ","YOUR ","MY "," IVE "," YOUVE "," IM "," YOURE "];
+
+  var gRepliesData = /* lines 2080 to 2130 (total=72=36 pairs) */
+           [ 1,3, 4,2,   6,4,  6,4, 10,4, 14,3, 17,3, 20,2, 22,3, 25,3
+           ,28,4, 28,4, 32,3, 35,5, 40,9, 40,9, 40,9, 40,9, 40,9, 40,9
+           ,49,2, 51,4, 55,4, 59,4, 63,1, 63,1, 64,5, 69,5, 74,2, 76,4
+           ,80,3, 83,7, 90,3, 93,6, 99,7, 106,7             // the last 7 was originally a 6 (see original basic source)
+           ];
+
+  // the variables below are NOT prefix with 'var' because they are Global variables
+
+  gContext = 1;
+  gResetButton = null;
+
+  g_srnArray = new Array(gKeywords.length);
+  index_k = 0;  // replaces keyword_index_k
+	
+  last_p$ = "";
+  answer_i$=""; 
+  c$ = "";                // holds the text following the matched keyword
+  prompt$ = "";
+
+  var response$;      // (strC$) Y/N answer from the prompt.  (strT$=tildaresponse$ is redundant)
+
+// function assumes response variable is uppercase (done automatically in keypress textbox event)
+function processResponse() {
+
+  switch (gContext) {
+    case 1:
+      context_1_process();
+      break;
+    case 2:
+      context_2_process();
+      break;
+    default:
+      break;
+  }
+  context_intro(gContext);
+}
+
+// search input string for 1 of 36 (0-35) keywords (e.g. 'CAN YOU')
+function matchKeyword() {
+
+  for (var k=0; k < gKeywords.length-1; k++) {  // no need to search last keyword
+    if (answer_i$.match(gKeywords[k]) != null ) {
+      break;
+    }
+  }
+  return(k);
+}
+
+// main handler for producing responses
+function context_1_process() {
+
+  answer_i$ = response$;
+  answer_i$ = " " + answer_i$.replace(/'/g, "") + " ";  // add trailing spaces + remove ALL (/g) apostrophes
+
+  if (answer_i$ == last_p$) {
+    prompt$ = "Please don't repeat yourself!";
+    gContext = 1;
+  } else if (answer_i$.match(/SHUT/) != null ) {
+    prompt$ = "Shut Up...";
+    gContext = 2;
+  } else {
+    index_k = matchKeyword();
+
+    if (index_k < 35) {
+
+      var re = new RegExp("^.*?" + gKeywords[index_k] + "(.*?)$");  // this gets all the text following the FOUND keyword
+      c$ = answer_i$.replace(re,"$1");
+      for (var x=0; x < gConjugations.length; x+=2) {    // replace conjugations
+        var s$ = gConjugations[x];
+        var r$ = gConjugations[x+1];
+        c$ = c$.replace( new RegExp(s$, "g"), r$);
+      }
+    }
+
+    var l_reply$ = gReplies[g_srnArray[index_k].r];
+    var len = l_reply$.length;
+
+    if ( "*" == l_reply$[len-1] ) {                      // last character
+      prompt$ = l_reply$.substring(0,len-1) + c$;
+    } else {
+      prompt$ = l_reply$;
+    }
+
+    var l_obj = g_srnArray[index_k];
+    if (++l_obj.r > l_obj.n) l_obj.r = l_obj.s;          // alternate answer (circle)
+  }
+
+  last_p$ = answer_i$;    // line 750   P$=I$:GOTO 190
+}
+
+// used post user entering 'shut (up)' response
+function context_2_process() {
+  prompt$ = "Hit the RESET Button to restart ...";
+}
+
+function context_intro(id) {
+
+  switch (id) {
+    case 1:
+      basPrint(prompt$ );
+      basPrintSC("? ");
+      break;
+    case 2:
+      basPrint(prompt$ );
+      gResetButton.style.display = "inline";
+      break;
+    default:
+      break;
+  }
+}
+
+function resetEliza() {
+  basPrint("", "CLS");                      // this clears the display
+  gResetButton.style.display = "none";
+  init();
+}
+
+/* initialise function - called onload of body */
+function keyProcess() {
+
+  aryKP = new Array();
+  for (i=0; i<gKeywords.length; i++) {
+    aryKP.push(i);
+    aryKP.push(gKeywords[i]);
+  }
+  return(aryKP.join(','));
+}
+
+function initSRNarray() {
+
+  for (var x=0; x < gRepliesData.length; x+=2) {
+    srnObj = new Object();
+    srnObj.s = gRepliesData[x] - 1;   // take one off as data refers to basic arrays (which start with 1 and not zero)
+    srnObj.r = srnObj.s;
+    srnObj.n = srnObj.s + gRepliesData[x+1] - 1;
+    g_srnArray[x/2] = srnObj;
+  }
+
+//for (i=0; i<g_srnArray.length; i++) {
+//  basPrint(i + ") " + g_srnArray[i].s + "|" + g_srnArray[i].r + "|" + g_srnArray[i].n);
+//}
+
+}
+
+function init() {
+
+  initSRNarray();
+  gContext = 1;
+
+  basPrint("ELIZA");  // 10
+  basPrint("CREATIVE COMPUTING");
+  basPrint("MORRISTOWN, NEW JERSEY");
+  basPrint();
+
+  prompt$ = "HI!  I'M ELIZA.  WHAT'S YOUR PROBLEM ? ";
+  context_intro(1);
+  gResetButton = document.getElementById("reset");
+
+  inputtbox.focus();
+}
+
+/* original program listing *
+ * see: ftp://ftp.decus.org/decus/vms/sig_tapes/vax85a/rca/gcegen/eliza.bas
+ *  or: http://ftp.back2roots.org/back2roots/cds/xetec/fish_n_more_vol1/fish/grabbag/eliza.bas
+ *  or: http://www.atariarchives.org/morebasicgames/showpage.php?page=57 (for the original book)
+ * see also: www.manifestation.com/neurotoys/eliza.php3
+
+1     REM
+20    REM   ELISA DOCTOR
+30    REM   CREATED BY JOSEPH WEIZENBAUM
+40    REM   THIS VERSION BY JEFF SHRAGER
+50    REM   EDITED AND MODIFIED FOR MITS 8K BASIC 4.0 BY 
+60    REM   STEVE NORTH -- CREATIVE COMPUTING
+70    REM   PO BOX 789-M MORRISTOWN NJ  07960
+80    REM
+90    REM   -INITIALIZATION-
+100   SCREEN 1,2,0:WIDTH 80
+105   PRINT "PLEASE TURN ON YOUR 'CAPS LOCK' KEY."
+110   DIM C$(72),I$(72),K$(72),F$(72),S$(72),R$(72),P$(72),Z$(72)
+120   DIM S(36),R(36),N(36)
+130   N1=36:N2=12:N3=112
+140   FOR X=1 TO N1+N2+N3:READ Z$:NEXT X:REM SAME AS RESTORE
+150   FOR X=1 TO N1
+160   READ S(X),L:R(X)=S(X):N(X)=S(X)+L-1
+170   NEXT X
+175   PRINT "HI!  I'M ELIZA.  WHAT'S YOUR PROBLEM?"
+180   Z9$="HI!  I'M ELI ZA.  WHAT'S YOUR PROBLEM?":GOSUB 5000
+190   REM
+200   REM   -USER INPUT SECTION-
+210   REM
+220   INPUT I$
+230   I$=" "+I$+" "
+240   REM   GET RID OF APOSTROPHES
+250   FOR L=1 TO LEN(I$)
+260   IF MID$(I$,L,1)="'" THEN I$=LEFT$(I$,L-1)+RIGHT$(I$,LEN(I$)-L):GOTO 260
+270   IF L+4<=LEN(I$) THEN GOTO 280 ELSE GOTO 290
+280   IF MID$(I$,L,4)="SHUT" THEN Z9$="SHUT UP..":PRINT Z9$:GOSUB 5000:GOTO 2140
+290   NEXT L
+300   IF I$=P$ THEN Z9$="PLEASE DON'T REPEAT YOURSELF!":PRINT Z9$:GOSUB 5000:GOTO 190
+310   REM
+320   REM   -FIND KEYWORD IN I$-
+330   REM
+340   RESTORE
+350   S=0
+360   FOR K=1 TO N1
+370   READ K$
+380   IF S>0 THEN 420
+390   FOR L=1 TO LEN(I$)-LEN(K$)+1
+400   IF MID$(I$,L,LEN(K$))=K$ THEN S=K:T=L:F$=K$
+410   NEXT L
+420   NEXT K
+430   IF S>0 THEN K=S:L=T:GOTO 460
+440   K=36:GOTO 670:REM  WE DIDN'T FIND ANY KEYWORDS
+450   REM
+460   REM   TAKE RIGHT PART OF STRING AND CONJUGATE IT
+470   REM   USING THE LIST OF STRINGS TO BE SWAPPED
+480   REM
+490   RESTORE:FOR X=1 TO N1:READ Z$:NEXT X:REM SKIP OVER KEYWORDS
+500   C$=" "+RIGHT$(I$,LEN(I$)-LEN(F$)-L+1)
+510   FOR X=1 TO N2/2
+520   READ S$,R$
+530   FOR L=1 TO LEN(C$)
+540   IF L+LEN(S$)>LEN(C$) THEN 590
+550   IF MID$(C$,L,LEN(S$))<>S$ THEN 590
+560   C$=LEFT$(C$,L-1)+R$+RIGHT$(C$,LEN(C$)-L-LEN(S$)+1)
+570   L=L+LEN(R$)
+580   GOTO 630
+590   IF L+LEN(R$)>LEN(C$) THEN 630
+600   IF MID$(C$,L,LEN(R$))<>R$ THEN 630
+610   C$=LEFT$(C$,L-1)+S$+RIGHT$(C$,LEN(C$)-L-LEN(R$)+1)
+620   L=L+LEN(S$)
+630   NEXT L
+640   NEXT X
+650   IF MID$(C$,2,1)=" " THEN C$=RIGHT$(C$,LEN(C$)-1):REM ONLY ONE SPACE
+660   REM
+670   REM   NOW USING THE KEYWORD NUMBER (K) GET REPLY
+680   REM
+690   RESTORE:FOR X=1 TO N1+N2:READ Z$:NEXT X
+700   FOR X=1 TO R(K):READ F$:NEXT X:REM  READ RIGHT REPLY
+710   R(K)=R(K)+1
+720   IF R(K)>N(K) THEN R(K)=S(K)
+730   IF RIGHT$(F$,1)<>"*" THEN Z9$=F$:PRINT  F$:GOSUB 5000:P$=I$:GOTO 190
+740   Z9$=LEFT$(F$,LEN(F$)-1)+C$:PRINT Z9$:GOSUB 5000
+750   P$=I$:GOTO 190
+760   REM
+770   REM   -PROGRAM DATA FOLLOWS-
+780   REM
+790   REM KEYWORDS
+800   REM
+810   DATA "CAN YOU","CAN I","YOU ARE","YOURE","I DONT","I FEEL"
+820   DATA "WHY DONT YOU","WHY CANT I","ARE YOU","I CANT","I AM","IM "
+830   DATA "YOU ","I WANT","WHAT","HOW","WHO","WHERE","WHEN","WHY"
+840   DATA "NAME","CAUSE","SORRY","DREAM","HELLO","HI ","MAYBE"
+850   DATA " NO","YOUR","ALWAYS","THINK","ALIKE","YES","FRIEND"
+860   DATA "COMPUTER","NOKEYFOUND"
+870   REM
+880   REM   STRING DATA FOR CONJUGATIONS
+890   REM
+900   DATA " ARE "," AM ","WERE ","WAS "," YOU "," I ","YOUR ","MY "
+910   DATA " IVE "," YOUVE "," IM "," YOURE "
+920   REM
+930   REM   REPLIES
+940   REM
+950   DATA "DON'T YOU BELIEVE THAT I CAN*"
+960   DATA "PERHAPS YOU WOULD LIKE TO BE ABLE TO*"
+970   DATA "YOU WANT ME TO BE ABLE TO*"
+980   DATA "PERHAPS YOU DON'T WANT TO*"
+990   DATA "DO YOU WANT TO BE ABLE TO*"
+1000  DATA "WHAT MAKES YOU THINK I AM*"
+1010  DATA "DOES IT PLEASE YOU TO BELIEVE I AM*"
+1020  DATA "PERHAPS YOU WOULD LIKE TO BE*"
+1030  DATA "DO YOU SOMETIMES WISH YOU WERE*"
+1040  DATA "DON'T YOU REALLY*"
+1050  DATA "WHY DON'T YOU*"
+1060  DATA "DO YOU WISH TO BE ABLE TO*"
+1070  DATA "DOES THAT TROUBLE YOU?"
+1080  DATA "TELL ME MORE ABOUT SUCH FEELINGS."
+1090  DATA "DO YOU OFTEN FEEL*"
+1100  DATA "DO YOU ENJOY FEELING*"
+1110  DATA "DO YOU REALLY BELIEVE I DON'T*"
+1120  DATA "PERHAPS IN GOOD TIME I WILL*"
+1130  DATA "DO YOU WANT ME TO*"
+1140  DATA "DO YOU THINK YOU SHOULD BE ABLE TO*"
+1150  DATA "WHY CAN'T YOU*"
+1160  DATA "WHY ARE YOU INTERESTED IN WHETHER OR NOT I AM*"
+1170  DATA "WOULD YOU PREFER IF I WERE NOT*"
+1180  DATA "PERHAPS IN YOUR FANTASIES I AM*"
+1190  DATA "HOW DO YOU KNOW YOU CAN'T*"
+1200  DATA "HAVE YOU TRIED?"
+1210  DATA "PERHAPS YOU CAN NOW*"
+1220  DATA "DID YOU COME TO ME BECAUSE YOU ARE*"
+1230  DATA "HOW LONG HAVE YOU BEEN*"
+1240  DATA "DO YOU BELIEVE IT IS NORMAL TO BE*"
+1250  DATA "DO YOU ENJOY BEING*"
+1260  DATA "WE WERE DISCUSSING YOU-- NOT ME."
+1270  DATA "OH, I*"
+1280  DATA "YOU'RE NOT REALLY TALKING ABOUT ME, ARE YOU?"
+1290  DATA "WHAT WOULD IT MEAN TO YOU IF YOU GOT*"
+1300  DATA "WHY DO YOU WANT*"
+1310  DATA "SUPPOSE YOU SOON GOT*"
+1320  DATA "WHAT IF YOU NEVER GOT*"
+1330  DATA "I SOMETIMES ALSO WANT*"
+1340  DATA "WHY DO YOU ASK?"
+1350  DATA "DOES THAT QUESTION INTEREST YOU?"
+1360  DATA "WHAT ANSWER WOULD PLEASE YOU THE MOST?"
+1370  DATA "WHAT DO YOU THINK?"
+1380  DATA "ARE SUCH QUESTIONS ON YOUR MIND OFTEN?"
+1390  DATA "WHAT IS IT THAT YOU REALLY WANT TO KNOW?"
+1400  DATA "HAVE YOU ASKED ANYONE ELSE?"
+1410  DATA "HAVE YOU ASKED SUCH QUESTIONS BEFORE?"
+1420  DATA "WHAT ELSE COME TO MIND WHEN YOU ASK THAT?"
+1430  DATA "NAMES DON'T INTEREST ME."
+1440  DATA "I DON'T CARE ABOUT NAMES-- PLEASE GO ON."
+1450  DATA "IS THAT THE REAL REASON?"
+1460  DATA "DON'T ANY OTHER REASONS COME TO MIND?"
+1470  DATA "DOES THAT REASON EXPLAIN ANYTHING ELSE?"
+1480  DATA "WHAT OTHER REASONS MIGHT THERE BE?"
+1490  DATA "PLEASE DON'T APOLOGIZE!"
+1500  DATA "APOLOGIES ARE NOT NECESSARY."
+1510  DATA "WHAT FEELINGS DO YOU HAVE WHEN YOU APOLOGIZE."
+1520  DATA "DON'T BE SO DEFENSIVE!"
+1530  DATA "WHAT DOES THAT DREAM SUGGEST TO YOU?"
+1540  DATA "DO YOU DREAM OFTEN?"
+1550  DATA "WHAT PERSONS APPEAR IN YOUR DREAMS?"
+1560  DATA "ARE YOU DISTURBED BY YOUR DREAMS?"
+1570  DATA "HOW DO YOU DO ... PLEASE STATE YOUR PROBLEM."
+1580  DATA "YOU DON'T SEEM QUITE CERTAIN."
+1590  DATA "WHY THE UNCERTAIN TONE?"
+1600  DATA "CAN'T YOU BE MORE POSITIVE?"
+1610  DATA "YOU AREN'T SURE?"
+1620  DATA "DON'T YOU KNOW?"
+1630  DATA "ARE YOU SAYING NO JUST TO BE NEGATIVE?"
+1640  DATA "YOU ARE BEING A BIT NEGATIVE."
+1650  DATA "WHY NOT?"
+1660  DATA "ARE YOU SURE?"
+1670  DATA "WHY NO?"
+1680  DATA "WHY ARE YOU CONCERNED ABOUT MY*"
+1690  DATA "WHAT ABOUT YOUR OWN*"
+1700  DATA "CAN YOU THINK OF A SPECIFIC EXAMPLE?"
+1710  DATA "WHEN?"
+1720  DATA "WHAT ARE YOU THINKING OF?"
+1730  DATA "REALLY, ALWAYS?"
+1740  DATA "DO YOU REALLY THINK SO?"
+1750  DATA "BUT YOU ARE NOT SURE YOU*"
+1760  DATA "DO YOU DOUBT YOU*"
+1770  DATA "IN WHAT WAY?"
+1780  DATA "WHAT RESEMBLANCE DO YOU SEE?"
+1790  DATA "WHAT DOES THE SIMILARITY SUGGEST TO YOU?"
+1800  DATA "WHAT OTHER CONNECTIONS DO YOU SEE?"
+1810  DATA "COULD THERE REALLY BE SOME CONNECTION?"
+1820  DATA "HOW?"
+1830  DATA "YOU SEEM QUITE POSITIVE."
+1840  DATA "ARE YOU SURE?"
+1850  DATA "I SEE."
+1860  DATA "I UNDERSTAND."
+1870  DATA "WHY DO YOU BRING UP THE TOPIC OF FRIENDS?"
+1880  DATA "DO YOUR FRIENDS WORRY YOU?"
+1890  DATA "DO YOUR FRIENDS PICK ON YOU?"
+1900  DATA "ARE YOU SURE YOU HAVE ANY FRIENDS?"
+1910  DATA "DO YOU IMPOSE ON YOUR FRIENDS?"
+1920  DATA "PERHAPS YOUR LOVE FOR FRIENDS WORRIES YOU."
+1930  DATA "DO COMPUTERS WORRY YOU?"
+1940  DATA "ARE YOU TALKING ABOUT ME IN PARTICULAR?"
+1950  DATA "ARE YOU FRIGHTENED BY MACHINES?"
+1960  DATA "WHY DO YOU MENTION COMPUTERS?"
+1970  DATA "WHAT DO YOU THINK MACHINES HAVE TO DO WITH YOUR PROBLEM?"
+1980  DATA "DON'T YOU THINK COMPUTERS CAN HELP PEOPLE?"
+1990  DATA "WHAT IS IT ABOUT MACHINES THAT WORRIES YOU?"
+2000  DATA "SAY, DO YOU HAVE ANY PSYCHOLOGICAL PROBLEMS?"
+2010  DATA "WHAT DOES THAT SUGGEST TO YOU?"
+2020  DATA "I SEE."
+2030  DATA "I'M NOT SURE I UNDERSTAND YOU FULLY."
+2040  DATA "COME COME ELUCIDATE YOUR THOUGHTS."
+2050  DATA "CAN YOU ELABORATE ON THAT?"
+2060  DATA "THAT IS QUITE INTERESTING"
+2070  REM
+2080  REM   DATA FOR FINDING REPLIES
+2090  REM
+2100  DATA 1,3,4,2,6,4,6,4,10,4,14,3,17,3,20,2,22,3,25,3
+2110  DATA 28,4,28,4,32,3,35,5,40,9,40,9,40,9,40,9,40,9,40,9
+2120  DATA 49,2,51,4,55,4,59,4,63,1,63,1,64,5,69,5,74,2,76,4
+2130  DATA 80,3,83,7,90,3,93,6,99,7,106,6
+2140  END
+5000  REM SPEECH SUBROUTINE
+5010  ZA$=TRANSLATE$(Z9$)
+5020  ZA%=NARRATE(ZA$)
+5030  RETURN
+
+style="width:65%;"
+*/
+</script>
+</head>
+
+<body onload="init()";>
+<img src='common/eliza_img.jpg'></img>&nbsp;<img style="float:right" src='common/morebasicgames_tiny.gif'><img><br>
+&nbsp;&nbsp;&nbsp;&nbsp;CREATIVE COMPUTING  MORRISTOWN, NEW JERSEY<br>
+<br>
+<textarea id="term1"></textarea>&nbsp;<img style="float:right" src='common/eliza_robot.jpg'><img><br>
+
+<input style='display:none;' TYPE="button" title="Reset" value="RESET" id="reset" onclick="resetEliza();" />&nbsp;
+<input TYPE="button" id="load" title="Load Eliza data" value="Load" onclick="LoadEliza();" />&nbsp;
+<input TYPE="button" id="save" title="Save Elisa data" value="Save" onclick="SaveElisa();" />&nbsp;
+<br>command: <input id="inputtbox" type="text" size="100" onkeypress="checkEnter(this);"></input>
+<br><span id="saveconf">X</span>
+<br>
+
+
+</body>
+<html>

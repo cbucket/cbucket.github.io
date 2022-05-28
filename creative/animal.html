@@ -1,0 +1,289 @@
+<html>
+<!-- Javascript version of Animal 20 questions type program http://www.moorecad.com/classicbasic/basic/creative/animal.bas  -->
+<!-- 13/09/13 - started replacing original basic variables with more meaningfull names -->
+<!-- 14/09/13 - heavily trimmed down.  For original look in old sub-folder -->
+<!-- 16/09/13 - stage 1 refactoring complete (new buttons for Y and N) -->
+<!-- 18/09/13 - now uses common functions.  see common/bas_funcs.js -->
+<!-- 19/09/13 - incorporated AJAX based loading facility -->
+
+<!-- *** BUG *** when one does not type Y/N at question (e.g. lkajdsfl) the program goes into an undefined state.  Investigate!!! -->
+
+<head>
+
+<link rel="stylesheet" type="text/css" href="common/creative.css" />
+<script type="text/javascript" src="common/bas_funcs.js"></script>
+<script>
+
+/* global variables */
+
+gContext = 1;
+  // the variables below are NOT prefix with 'var' because they are Global variables
+
+// var AryA$=[ "4","~QDOES IT SWIM~Y2~N3~","~AFISH","~ABIRD" ]; // lines 70 and 530
+   var AryA$=["16","~QDOES IT SWIM~Y2~N3~","~QIS IT A MAMMAL~Y9~N8~","~QDOES IT HAVE WINGS~N5~Y4~","~ABIRD","~QDOES IT CHASE MICE~Y7~N6~","~QDOES IT HAVE A TRUNK~Y11~N10~","~ACAT","~AFISH","~AWHALE","~QDOES IT HAVE STRIPES~Y15~N14~","~QIS IT EXTINCT~Y13~N12~","~AELEPHANT","~AWOOLLY MAMMOTH","~ALION","~ATIGER"];
+
+  var answer$;        // (strA$) response from prompt (strB$) complement of response (now uses opposite fn)
+  var NextQuID=1;     // (intK) number of next question, based on answer to question. nextQ$ is now derived form this.
+  var intZ1;          // Used in parsing the list of animals, used with offsets and stuff
+  var response$;      // (strC$) Y/N answer from the prompt.  (strT$=tildaresponse$ is redundant)
+  var newAnimal$;     // (strV$) animal person was thinking of
+  var newQues$;       // (strX$) question to distinguish new animal from existing animal
+
+// replaced lines 310-320 in original program.  (Y becomes N, N becomes Y)
+function opposite(_YN) {
+
+  if (_YN.match(/^[YN]$/) == null) {
+    alert("input (" + _YN + ") must be Y or N\nFunction will return NULL\n*** THIS SHOULD NEVER HAPPEN ! ***");
+    return(null);
+  } else return("YN"[+("Y"==_YN)]);
+}
+
+// designed to be changed to use a text box instead of a prompt.
+function promptX(question, options)
+{
+  response = "";   // temporary;
+  basPrintSC(question + " (" + options + ") ");
+  return(response);
+}
+
+// carried out when user types LIST at the initial prompt
+function list_animals()  // 600 - 680
+{
+//basPrint2("AryA$", AryA$);
+  basPrint();
+  basPrint("ANIMALS I ALREADY KNOW ARE:");
+  intX = 0;
+
+  for (i=0; i<AryA$.length; i++) {
+    if (AryA$[i].substr(0,2) == "~A") {
+      basPrint(AryA$[i].substr(2));
+    }
+  }
+  basPrint();
+}
+
+// performed when user types DEBUG at the initial prompt
+// prints the animal array in the format that it is initialised in the program.
+// This allows one to cut and paste the definition back into the program.  This is a temporary measure pending getting
+// the program to perform an ajax callback to save the array on the server side.
+function printAnimalAry() {
+
+  basPrint();
+  var tempAry$ = new Array();
+  for (var i=0; i<AryA$.length; i++) {
+    tempAry$.push('"' + AryA$[i] + '"');
+  }
+  basPrint("[" + tempAry$.join() + "]");
+  basPrint();
+}
+
+// function assumes response variable is uppercase (done automatically in keypress textbox event)
+function processResponse() {
+
+  switch (gContext) {
+    case 1:
+      context_1_process();
+      break;
+    case 2:
+      context_2_process();
+      break;
+    case 3:
+      context_3_process();
+      break;
+    case 4:
+      context_4_process();
+      break;
+    case 5:
+      context_5_process();
+      break;
+    case 6:
+      context_6_process();
+      break;
+    default:
+      break;
+  }
+  context_intro(gContext);
+}
+
+function context_1_process() {
+
+  if (response$ == "LIST") {
+    list_animals();                         // 140 (then 600)
+    gContext = 1;
+  } else if (response$ == "DEBUG") {
+    printAnimalAry();
+    gContext = 1;
+  } else if (response$ == "Y") {
+    gLoadButton.disabled = true;    // disable the load/save option
+    gSaveButton.disabled = true;
+    gContext = 2;
+    nextQuID = 1;
+  } else if (response$ == "N") {
+    basPrint("The End (is come).");
+  }
+}
+
+// this is for processing Y/N answers to QUESTIONs.  If the result
+// yields an animal the goto context 3
+function context_2_process() {
+
+  if (response$ != "Y" && response$ != "N") {
+    alert("ERROR: in fn context_2_process()");
+  }
+  var re1 = new RegExp("^.*?~" + response$ + "(\\d+)~.*?$");  // + added '+' after \d to fix bug - was only handling single digits
+  nextQuID = parseInt(AryA$[nextQuID].replace(re1,"$1"));     // count use re.exec() here too.  See worksmart/converter.html
+
+  if (AryA$[nextQuID].substr(0,2) != "~Q") {   // if the next question string identifies an animal then NEW context
+      gContext = 3;
+  }
+}
+
+function context_intro(id) {
+
+  switch (id) {
+    case 1:
+      gLoadButton.disabled = false;    // enable the load/save option
+      gSaveButton.disabled = false;
+      promptX("ARE YOU THINKING OF AN ANIMAL ?", "Y/N/LIST/DEBUG");
+      break;
+    case 2:
+      promptX(AryA$[nextQuID].split("~Q")[1].split("~")[0] + " ?","Y/N");  // 410-430
+      break;
+    case 3:
+      promptX("IS IT A " + AryA$[nextQuID].substr(2) + " ?", "Y/N");  // 200-210
+      break;
+    case 4:
+      promptX("THE ANIMAL YOU WERE THINKING OF WAS A ...", ""); // 240
+      break;
+    case 5:
+      promptX("PLEASE TYPE IN A QUESTION THAT WOULD DISTINGUISH A " + newAnimal$ + " FROM A " + AryA$[nextQuID].substr(2)); 
+      break;
+    case 6:
+      promptX("FOR A " + newAnimal$ + " THE ANSWER WOULD BE ?", "Y/N");  // 280-290 
+      break;
+    default:
+      break;
+  }
+}
+
+function context_3_process() {
+
+    if (response$ == "Y") {
+      basPrint("WHY NOT TRY ANOTHER ANIMAL ?");
+      gContext = 1;
+    } else {
+      gContext = 4;
+    }
+}
+
+function context_4_process() {
+
+  newAnimal$ = response$;
+  gContext = 5;
+}
+
+function context_5_process() {
+
+  newQues$ = response$;
+  gContext = 6;
+}
+
+// adds a new animal to the array
+function context_6_process() {
+
+  answer$ = response$;
+
+  if (answer$ == "Y" || answer$ == "N") {
+    intZ1 = parseInt(AryA$[0]);  // 330                  get the INTEGER in the first cell
+    AryA$[0] = (intZ1+2).toString();  // 340             store value+2 in first cell (effectively add 2 cells the array)
+
+    AryA$[intZ1] = AryA$[nextQuID];                   // store the current question in the last cell
+    AryA$[intZ1+1] = "~A" + newAnimal$;               // store the new animal in the last cell + 1
+    AryA$[nextQuID] = "~Q" +newQues$ +"~" +answer$ +(intZ1+1).toString() +"~" +opposite(answer$) +intZ1.toString() +"~"; // 370
+                                                      // store the new question with the Y/N answer references in the current cell
+    promptX("question added", newQues$);  // 280-290 
+    gContext = 1;
+  } else {
+    alert("context_6_process: must answer Y or N !!");
+  }
+}
+
+/* initialise function - called onload of body */
+function init() {
+
+  basPrint("ANIMAL");  // 10
+  basPrint("CREATIVE COMPUTING  MORRISTOWN, NEW JERSEY");
+  basPrint();
+  basPrint("PLAY 'GUESS THE ANIMAL'");
+  basPrint();
+  basPrint("THINK OF AN ANIMAL AND THE COMPUTER WILL TRY TO GUESS IT.");
+  basPrint();
+
+  gLoadButton = document.getElementById("load");
+  gSaveButton = document.getElementById("save");
+
+  context_intro(1);     // are you thinking of an animal, etc...
+
+  inputtbox.focus();
+}
+
+/* --------------------------------------------------------- */
+function LoadAnimals()
+{
+  var xmlhttp = getXMLReqObj(window);
+
+  xmlhttp.onreadystatechange=function()
+    {
+      if (xmlhttp.readyState==4 && xmlhttp.status==200) {
+        AryA$ = xmlhttp.responseText.split(',');
+        document.getElementById("saveconf").innerHTML=xmlhttp.responseText;
+        inputtbox.focus();
+      }
+    }
+  xmlhttp.open("GET","animals_load.php", true);
+  xmlhttp.send();
+}
+
+function SaveAnimals(filespec, content)
+{
+    filespec = "animal.sav1";
+    content = AryA$;
+    document.getElementById("saveconf").innerHTML="";     // this will clear the save message dialogue
+    var xmlhttp = getXMLReqObj(window);
+    xmlhttp.onreadystatechange=function() {
+      if (xmlhttp.readyState==4 && xmlhttp.status==200) {
+        document.getElementById("saveconf").innerHTML=xmlhttp.responseText;
+        inputtbox.focus();
+      }
+    }
+    xmlhttp.open("POST","animals_save.php",true);
+    xmlhttp.setRequestHeader("Content-type","application/x-www-form-urlencoded");
+    xmlhttp.send("editor="+encodeURIComponent(content)+"&savefile="+filespec);
+}
+
+/* ---------------------------------------------------------*/
+
+/* original program listing *
+ * this can now be found in file animal_listing.bas (in same folder) ***
+ */
+</script>
+</head>
+
+<body onload="init()";>
+<img src='common/animal_img.jpg'></img>&nbsp;<img style="float:right" src='common/basiccompgames_tiny.gif'><img><br>
+&nbsp;&nbsp;&nbsp;&nbsp;CREATIVE COMPUTING  MORRISTOWN, NEW JERSEY<br>
+<br>
+<textarea id="term1"></textarea><br>
+
+<!-- question: <span id="quest1"></span> -->
+<input TYPE="button" title="answer (Y)es" value="Yes" onclick="TickYesOrNo('Y');" />&nbsp;
+<input TYPE="button" title="answer (N)es" value="No" onclick="TickYesOrNo('N');" />&nbsp;
+<input TYPE="button" id="load" title="Load animal list" value="Load" onclick="LoadAnimals();" />&nbsp;
+<input TYPE="button" id="save" title="Save animal list" value="Save" onclick="SaveAnimals();" />&nbsp;
+<br>command: <input id="inputtbox" type="text" size="100" onkeypress="checkEnter(this);"></input>
+<br><span id="saveconf">X</span>
+<br>
+
+&#9822;
+</body>
+<html>

@@ -1,0 +1,15 @@
+/* this css file is used by all the creative computing games
+ *
+ * 22/09/13 - animal.bas, bible.bas
+ * 16/09/14 - term2 is used for eliza.bas
+ */
+
+textarea#term1 {
+        width: 65%;    /*was 600px*/
+        height:250px;
+        border: 3px solid #cccccc;
+        padding: 5px;
+        font-family: fixedsys, monospace;
+        background-color: RoyalBlue;
+        color: white;
+}

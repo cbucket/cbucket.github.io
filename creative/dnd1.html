@@ -1,0 +1,186 @@
+<!doctype html>
+<html>
+<head>
+<title>DND Dungeon Mapper</title>
+<style>
+span.heading { font-size: 15pt; font-weight: bold; }
+</style>
+
+<script src="cavern.js"></script>
+<script>
+// Dungeon Mapper Program
+// Ben Grimer 02/05/15
+
+// v1.0 - 02/05/15 show dungeon in original letter I=Wall format (refactored)
+
+/*
+(1) 0001 - Wall (Ver)
+(2) 0010 - Door (Ver)
+(3) 0011 - Secret Door (Ver)
+(4) 0100 - Wall (Hor)
+(8) 1000 - Door (Hor)
+(12)1100 - Secret Door (Hor)
+*/
+
+  var doorHor = "I---I";
+  var wallHor = "IIIII";
+  var wallVer = "I"
+
+  var contents = [ "   ", " \\ ", " / ", "\ /", "EXC"   /* "/" = UP, "\" = DOWN (note: \ is escape char */
+	         , "PIT", "TPT", "FNT", "ALT", "DGN"
+	         , "ORB", "MIR", "ELV", " $ ", "TRV"
+		 , "GNI"];
+ 
+  var TelenardL01 = [  
+  5,  4,  5,  4,  5,  4,117,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4, // (20)
+  1,  0,  1,  0,  4,  0,  1,  5,  1, 21,  4,  4,  4,  5,  4,  4,  4,  4,  4,  5, // (40)
+  1,  0,  4,  4,  0,  0,  5,  0,  1,  1,  5,  0,  1,  1,117,  4,  4,  1,  0,  1, // (60)
+  1, 97,  5,244,  4,  1,  1,  0,  1,  0,  4,  0,  1,  1,  2,  0,  0,  1,  0,  1, // (80)
+  1,  4,  8,  8,  8,  0,  0,  0,  0,  4,  4,  0,  1,  1,  1,  0,  0,  1,  0,  1, // (100)
+  1,  4,  1,  4,  0,  1,  0,  4,  4,  4,  4,  4,  0,  0,  5,  4,  4,  0,  0,  1, // (120)
+  1,  0,  0,  0,  1,  4,  4,  1,  4,  4,  4,  4,  0,  1,  4,  4,  4,  4,  4,  0, // (140)
+  5,  4,  4,  1,  5,  4,  0, 97,  0,  4,  4,  4,  4,  0,  5,  4,  4,  4,  4,  0, // (160)
+  5,  4,  1,  1,  5,  4,  0,  1,  0,  0,  0,  1, 96,  0,  1,  4,  4,  4,  4,  4, // (180)
+  1,  1,  1,  4, 20,  5,  4,  0,  0,  0,  0,  1,  1,  0,  4,  4,  4,  4,  4,  0, // (200)
+  1,  1,  1,  0,  0,  4,  1,  5,  4,  4,  1,  1,  1,  5,  8,  5,  4,  6,  4,  1, // (220)
+  1,113,  4,  4,  8,  4,  0,  1,245,  1,  1,  1,  1,  1,  0,  1,  0,  1,  0,  1, // (240)
+  1, 85,  4,  4,  4,  0,  0,  1,  0,  1,  1,  1,  1,  4,  1,  1,  9,  4,  9,  1, // (260)
+  1,  0,  0,  4,  4,  4,  4,  4,  8,  0,  1,  1,  1,  0,  9,  4,  1, 16,  1,130, // (280)
+  0,151,101,  5,132,  4,  4,  0,  0,  0,  1,  1,  5,  1,113,  0,  4,  6,  0,  1, // (300)
+  1,  4,  0,  0, 80,  0,  0,  4,135,  4,  1,  0,  0,  1,  4,  4,  4,  4,  4,  4, // (320)
+  9,  4,  9,  4,  9,212,  9,  4,  1,  1,  4,  4,  4, 64,  6,  4,  6,  1,  1, 97, // (340)
+  1,  0,  1,  0,  1,112,  1,  0,  1,  1,  1,  0,  0,  1,  1,  0,  1,  1,  1,  1, // (360)
+  5,  8,  5,  8,  5,  8,  5,  8,  1,  1,  4,  4,  1, 97,  5,  4,  0,  1,  1,  1, // (380)
+  1,  0,  1,  0,  2,  0,  2, 16,225, 97,  4,  4,  1,  1,  2,  0,  0,  1,  4,  0];// (400)
+
+// globals
+
+var out_ary = new Array();                          // used to build output data
+var cellAry = new Array();                          // used to build output data
+for (i2=0; i2<20; i2++) { cellAry[i2] = new Array(); }
+
+function doTranslate() {
+
+  var processed = document.getElementById('processed');
+  var level = document.getElementById('levelSel').value;
+  var _topRHS=true;
+  var _cavern = CavernAll[level-1];  /* TelenardL01 CavernL08=CavernAll[7] */
+  var _row;
+  var _col;
+
+//alert("out_ary size = " + out_ary.length);
+//alert("cellAry size = " + cellAry.length);
+
+  out_ary = [];
+  processed.value = "";
+  for (_row=0; _row<20; _row++)
+  {
+    for ( _col=0; _col<cellAry.length; _col++) {
+      var _id = 20*_row + _col;                   // calculate offset in dungeon array
+      var _cell = _cavern[_id]; 
+      var _botLHS = (_id-20>=0) ? (( _cavern[_id-20]&3)!=false) : true;
+
+      _topRHS = drawCell(cellAry[_col], _cell, _topRHS | _botLHS );
+    }
+
+    for (_r1=0; _r1<4; _r1++) {
+      for ( _c1=0; _c1 < cellAry.length; _c1++) {
+        out_ary.push(cellAry[_c1][_r1]);
+      }
+      out_ary.push("I\n");
+    }
+  } // end _row loop
+
+  out_ary.push( new Array(21).join("IIIIII") );    // repeat 6Is 20 times
+  out_ary.push("I\n");
+
+  processed.value = out_ary.join('');
+}
+
+/* This function converts an 8bit binary value (stored in the dungeon map array)
+ * to a 2*2 character grid holding I's for the wall, -- for door, ...'s for secret doors etc.
+ * It is called for all tiles in each row.
+ * The flag parameter indicates that the tile immediately to the left contained a top wall, door or secret door.
+ */
+function drawCell(_cellAryCol, __cell, _flag) {
+
+  for (var j1=0; j1<4; j1++) {
+
+    var _wc = "";
+    _cellAryCol[j1] = "      ";
+    _cell12 = __cell&12;
+    _cell3  = __cell&3;
+
+    switch(j1) {
+    case 0:
+      if      ( 4==_cell12)          _cellAryCol[j1] = "IIIIII";
+      else if ( 8==_cell12)          _cellAryCol[j1] = "II---I";
+      else if (12==_cell12)          _cellAryCol[j1] = "II...I";
+      else if ((0!=_cell3) || _flag) _cellAryCol[j1] = "I     ";
+      break;
+    case 1:
+    case 3:
+      if (0!=_cell3)         _cellAryCol[j1] = "I     ";
+      break;
+    case 2:
+      if      (1==_cell3) _wc="I "; // Wall (Hor)
+      else if (3==_cell3) _wc=": "; // Secret Door (Hor)
+      else                _wc="  "; // Blank or Door (Hor)
+      _cellAryCol[j1] = _wc + contents[(__cell & 0xf0) >> 4] + " ";  // include object or creature
+      break;
+    default:
+      alert("This should never happen!");
+    }
+  } // end for
+  return( __cell&12 );
+}
+
+</script>
+</head>
+
+<body>
+<span class="heading">DND Dungeon Mapper</span>
+<small> (decodes contents of 20x20x20 DND v1 dungeon maps)</small><br>
+<small>(Ben Grimer 28/04/2015)</small><br><br>
+
+<br>
+</select>
+Level:<select id="levelSel">
+  <option value="1">1</option>
+  <option value="2">2</option>
+  <option value="3">3</option>
+  <option value="4">4</option>
+  <option value="5">5</option>
+  <option value="6">6</option>
+  <option value="7">7</option>
+  <option value="8">8</option>
+  <option value="9">9</option>
+  <option value="10">10</option>
+  <option value="11">11</option>
+  <option value="12">12</option>
+  <option value="13">13</option>
+  <option value="14">14</option>
+  <option value="15">15</option>
+  <option value="16">16</option>
+  <option value="17">17</option>
+  <option value="18">18</option>
+  <option value="19">19</option>
+  <option value="20">20</option>
+</select>
+<input TYPE="button" value="process" onclick="doTranslate();" />&nbsp;
+<br>Completed Template:<br>
+<textarea rows="100" cols="140" class="cool" id="processed">Hit 'Process' above to draw dungeon.</textarea>
+
+<br>
+<br>
+
+<table style="font-family: Courier";>
+<tr>
+<td>IIIIIII<br>I TPT :<br>III-III</td><td width=60px height=60px style="background-image: url('room.png'); background-size: 60px 60px; padding:0px; text-align: center;">PIT</td>
+</tr><tr>
+<td>3</td><td>4</td>
+</tr>
+</table>
+
+</body>
+</html>

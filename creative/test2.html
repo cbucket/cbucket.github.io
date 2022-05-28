@@ -1,0 +1,27 @@
+<HTML>
+<HEAD>
+<META NAME="Description" CONTENT="Talk to Eliza!">
+<TITLE>Test2</TITLE>
+<script>
+var Days = {"sunday" : 0, "monday" : 1, "tuesday" : 3, "wednesday" : 4, "thursday" : 5, "friday" : 6, "saturday" : 7}; 
+
+var RoomAttributes = { "NORTH" : 1, "SOUTH" : 2, "EAST" : 3, "WEST" : 4, "UP" : 5, "DOWN" : 6, "OBJECT1" : 7, "MONSTER" : 8, "OBJECT2" : 9, "OBJECT3" : 10 };
+
+function init() {
+  alert("init()");
+}
+
+function test() {
+  alert("North >>" + RoomAttributes.NORTH + "<<");
+}
+
+</script>
+</HEAD>
+<body onload="init()">
+test2
+
+<input TYPE="button" value="test" onclick="test();" />&nbsp;
+
+
+</BODY>
+</HTML>

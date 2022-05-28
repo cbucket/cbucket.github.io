@@ -1,0 +1,212 @@
+<html>
+<!-- Javascript version of bible quiz program http://www.atariarchives.org/morebasicgames/showpage.php?page=6  -->
+<!-- 16/09/13 - v0.1 (still large remnants of animal program (on which it was based) -->
+<head>
+
+<link rel="stylesheet" type="text/css" href="common/creative.css" />
+<script type="text/javascript" src="common/bas_funcs.js"></script>
+<script>
+/* global variables */
+
+  gContext = 1;
+
+  // the variables below are NOT prefix with 'var' because they are Global variables
+
+//  var textarea1;
+
+  var total_questions_N=0;  // was N in original program
+  var asked_questions_C=0;  // was C (how many questions asked so far)
+  var total_correct_N1=0;   // was N1
+
+  var questionNbr = 0;
+
+  var gData =
+           [["WHO SET FIRE TO THREE HUNDRED FOXES TAILS", "SAMSON", "1 JUDGES 15:4,5"]
+           ,["WHAT HEBREW SERVED A QUICK LUNCH UNDER A TREE", "ABRAHAM", "GEN. 18:6-8"]
+           ,["WHAT HUNGRY MAN CURSED A FRUITLESS FIG TREE", "JESUS", "MARK 11:12-14"]
+           ,["WHO KILLED HIS BROTHER FOR HUMBLING HIS SISTER", "ABSALOM", "2 SAM. 13"]
+           ,["WHO HAD 300 CONCUBINES", "SOLOMON", "1 KINGS 11:1-3"]
+           ,["WHAT BOY HAD A VARIEGATED COAT", "JOSEPH", "GEN. 37:3"]
+           ,["WHO HAD A SEAMLESS COAT", "JESUS", "JOHN 19:23"]
+           ,["WHO TOOK OFF HIS SHOE TO BIND A CONTRACT", "BOAZ", "RUTH 4:7-9"]
+           ,["WHO SLEPT ON AN IRON BEDSTEAD OVER 13 FEET LONG", "OG", "DUET. 3:11"]
+           ,["WHO WAS THE FIRST CITY-BUILDER", "CAIN", "GEN. 4:17"]
+           ,["WHAT PHYSICIAN WAS AN AUTHOR", "LUKE", "COL. 4:14"]
+           ,["WHAT SONG-COMPOSER IS CREDITED WITH 1005 SONGS", "SOLOMON", "1 KINGS 4:32"]
+           ,["WHO WAS THE FIRST PERSON KILLED", "ABEL", "GEN. 4:8"]
+           ,["WHO WAS BURIED IN A CAVE WITH HIS WIFE", "ABRAHAM", "GEN. 25:9-10"]
+           ,["WHO ACCIDENTALLY HANGED HIMSELF IN A TREE", "ABSALOM", "2 SAM. 18:9"]
+           ,["WHAT BLIND MAN KILLED 3000 AT A RELIGIOUS FEAST", "SAMSON", "JUDGES 16:23-30"]
+           ,["WHAT WAS THE NAME OF THE FIRST CITY EVER BUILT", "ENOCH", "GEN. 4-17"]
+           ,["WHO WAS A MIGHTY HUNTER", "NIMROD", "GEN. 10:9-12"]
+           ,["WHO DROVE FURIOUSLY", "JEHU", "2 KINGS 9:20"]
+           ,["WHO WAS THE FIRST CHRISTIAN MARTYR", "STEPHEN", "ACTS 7"]
+           ,["WHO FELL ASLEEP DURING A LONG SERMON", "EUTYCHUS", "ACTS 20:9"]
+           ,["WHAT CITY IS CALLED THE CITY OF PALM TREES", "JERICHO", "DUET 34:3"]
+           ,["WHO CLIMBED A TREE TO SEE JESUS", "ZACCHAEUS", "LUKE 19:4"]
+           ,["WHO KILLED GOLIATH", "DAVID", "1 SAM. 17:49"]
+           ,["WHO WAS CAST INTO A DEN OF LIONS", "DANIEL", "DAN. 6:16"]
+           ];
+
+// function assumes response variable is uppercase (done automatically in keypress textbox event)
+function processResponse() {
+
+  switch (gContext) {
+    case 1:
+      context_1_process();
+      break;
+    case 2:
+      context_2_process();
+      break;
+    case 3:
+      context_3_process();
+      break;
+    default:
+      break;
+  }
+  context_intro(gContext);
+}
+
+function context_1_process() {
+
+  var re = new RegExp(/^\d.*$/);  // only allow numbers
+
+  if (re.test(response$) ) {
+    var numquest = parseInt(response$);
+    if (numquest>0 && numquest<26) {
+      total_questions_N = numquest;
+
+      asked_questions_C = 0;                 // reset the count (for use when user takes multiple quizzes
+      total_correct_N1 = 0;
+      questionNbr = 0;
+
+      shuffle(gData);       // need to re-randomize the array here too
+      gContext = 2;
+    } else { basPrint("Please enter a number from 1 to 25"); }
+
+  } else {
+    basPrint("Please enter a number up to 25");
+  }
+}
+
+// for processing answers to bible questions
+function context_2_process() {
+
+  if (response$ == gData[questionNbr][1]) {                                //    alert("right");
+    basPrint("CORRECT ANSWER--VERY GOOD! " + gData[questionNbr][2]);
+    total_correct_N1++;
+  } else {
+    basPrint("INCORRECT ANSWER");
+    basPrint("THE CORRECT ANSWER IS " + gData[questionNbr][1] + ". " + gData[questionNbr][2]);
+  }
+  asked_questions_C++;
+  questionNbr++;
+
+  if (asked_questions_C >= total_questions_N) {
+
+      basPrint("");
+      basPrint("OUT OF " + total_questions_N + " QUESTIONS YOU ANSWERED " + total_correct_N1 + " CORRECTLY.");
+      var percent = (total_correct_N1/total_questions_N) * 100;
+      basPrint("YOUR PERCENTAGE FOR CORRECT ANSWERS IS " + percent + "%");
+    gContext = 3;
+  }
+
+}
+
+function context_intro(id) {
+//basPrint("context_intro(" + id + ")");
+
+  switch (id) {
+    case 1:
+      basPrintSC("HOW MANY QUESTIONS DO YOU WISH TO TRY ? ");
+      break;
+    case 2:
+      basPrint("QUESTION #" + (questionNbr+1));
+      basPrintSC("  "+ gData[questionNbr][0] + " ? ");
+      break;
+    case 3:
+      basPrint("");
+      basPrintSC("Do you want to try again.  Y/N ? ");
+      break;
+    case 4:
+      basPrint("OK.  Have a nice day.");
+      basPrint("");
+      basPrint("AND GOD SHALL WIPE AWAY ALL TEARS FROM THEIR EYES: AND THERE SHALL BE NO MORE DEATH, NEITHER SORROW,");
+      basPrint("NOR CRYING, NEITHER SHALL THERE BE ANY MORE PAIN: FOR THE FORMER THINGS ARE PASSED AWAY.  REVELATION 21:4.");
+      break;
+    default:
+      alert("context_intro(id): this should never happen!");
+      break;
+  }
+}
+
+function context_3_process() {
+
+  var re = new RegExp(/^[YN]$/);  // only allow numbers
+  if (re.test(response$) ) {
+
+    switch (response$) {
+    case 'Y':
+      gContext = 1;
+      break;
+    case 'N':
+      gContext = 4;
+      break;
+    default:
+      alert("context_3_process(): This should never happen !!");
+      break;
+    }
+  } else {
+    basPrint("Please enter Y or N.");
+  }
+}
+
+// this function randomises the elements of an array
+// see: http://stackoverflow.com/questions/6274339/how-can-i-shuffle-an-array-in-javascript
+function shuffle(o){ //v1.0
+    for(var j, x, i = o.length; i; j = Math.floor(Math.random() * i), x = o[--i], o[i] = o[j], o[j] = x);
+    return o;
+};
+
+/* initialise function - called onload of body */
+function init() {
+
+  basPrint("BIBLE QUIZ");  // 5
+  basPrint("CREATIVE COMPUTING  MORRISTOWN, NEW JERSEY");
+  basPrint();
+  basPrint("THIS GAME IS A QUIZ WHICH TESTS");
+  basPrint("YOUR KNOWLEDGE OF BIBLICAL EVENTS, PLACES, AND PERSONS.");
+  basPrint();
+  basPrint("I WILL ASK YOU A QUESTION AND THEN WAIT FOR YOUR ANSWER.  IF YOUR ANSWER IS CORRECT");
+  basPrint("I WILL PROCEED TO THE NEXT QUESTION.  IF YOU ANSWER IS INCORRECT I WILL GIVE YOU THE");
+  basPrint("CORRECT ANSWER AND THEN PROCEED TO THE NEXT QUESTION.");
+  basPrint();
+  basPrint("ALL ANSWERS ARE ONE WORD.");
+  basPrint("ALL ANSWERS MUST BE CORRECTLY SPELLED.");
+  basPrint("THERE IS A TOTAL OF 25 QUESTIONS.");
+
+  context_intro(1);     // HOW MANY QUESTIONS DO YOU WISH TO TRY
+
+  inputtbox.focus();
+}
+
+/******* original program listing *******
+
+see: http://ccgi.coldcall.plus.com/creative/listing.jpg
+*/
+</script>
+</head>
+
+<body onload="init()";>
+<img src='common/bible_quiz_img.jpg'></img>&nbsp;<img style="float:right" src='common/morebasicgames_tiny.gif'><img><br>
+&nbsp;&nbsp;&nbsp;&nbsp;CREATIVE COMPUTING  MORRISTOWN, NEW JERSEY<br>
+<br><textarea id="term1"></textarea><br>
+<br>
+<input TYPE="button" title="answer (Y)es" value="Yes" onclick="TickYesOrNo('Y');" />&nbsp;
+<input TYPE="button" title="answer (N)es" value="No" onclick="TickYesOrNo('N');" />&nbsp;
+command: <input id="inputtbox" type="text" size="100" onkeypress="checkEnter(this);"></input>
+<br>
+
+
+</body>
+<html>
