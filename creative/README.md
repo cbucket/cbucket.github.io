@@ -20,3 +20,5 @@ new repository: git clone git@github.com:cbucket/cbucket.github.io.git
 Ben Grimer
 30/08/21
 
+e.g.  https://cbucket.github.io/creative/eliza.html
+
