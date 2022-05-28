@@ -1,0 +1,341 @@
+<html>
+<head>
+<title>Memory Game</title>
+<script language="javascript">
+
+// v1.00 30/03/15 - basic functionality works
+// v1.01          - added flexi-grid size
+
+/* bugs
+
+29/03/15 - when in tile clear mode if an already found tile is clicked on it reappears and does not disappear again
+
+*/
+
+<!-- see: http://www.softschools.com/games/memory/memory.html -->
+
+<!-- Begin
+
+var pics = new Array();
+cachePics(pics);
+
+var allcards=new Array(63);
+loadUp(allcards);
+
+var numTiles = 64;   // (6X6) grid, originally 100 (10X10)
+var map=new Array(numTiles);   // numTiles/2 pairs
+loadMap(map, allcards);
+
+var user = new Array(numTiles);   /* used to hold if tile (pair) has been found (0=not found, 1=found) */
+var temparray = new Array();
+var clickarray = new Array(0, 0);
+var ticker, sec, min, ctr, id, oktoclick, finished;
+
+var removeTiles;
+var _noshrink;
+var gOtherCard = -1;
+//var Gchar=":";
+var GtilesVisible = false;
+var Gscam;
+
+/**************************************************************************************/
+// sets up the game
+function init() {
+  removeTiles = document.getElementById("removecards").checked;
+  _noshrink = document.getElementById("noshrink").checked;
+  _timerButton = document.getElementById("b");
+  _imgAry = document.getElementsByName("img0");
+  _imgAryX = document.getElementsByName("imgX");
+  Gscam = document.getElementById("scam");
+
+  clearTimeout(id);
+  for (i = 0; i < numTiles ;i++) { user[i] = 0; }  // initially, all tiles not found
+  ticker = min = sec = ctr = finished = 0;
+
+  _timerButton.value = "";                         // used to show the time taken, initially blank
+  scrambleNew(map);                                //alert("mapNew:("+map.length+")\n"+map);
+  runclk();
+
+  for (i = 0; i < numTiles; i++) {
+    _imgAry[i].src = "image0.gif";
+  }
+  oktoclick = true;
+}
+
+/**************************************************************************************/
+function loadMap(_map, _allcards) {
+
+  for (i1=0; i1<_map.length/2; i1++) {
+    _map[(i1*2)] = _allcards[i1];
+    _map[(i1*2)+1] = _allcards[i1];
+  }
+}
+
+/**************************************************************************************/
+// this might be for caching etc.  Does not appear to be used elsewhere
+function cachePics(_pics) {
+
+  for (i1 = 0; i1 < 63; i1++) {
+    _pics[i1] = new Image();
+    _pics[i1].src = 'image' + i1 + '.gif';
+  }
+}
+
+/**************************************************************************************/
+function runclk() {
+  min = Math.floor(ticker/60);
+  sec = (ticker-(min*60))+'';
+  if(sec.length == 1) {sec = "0"+sec};
+  
+  ticker++;
+  _timerButton.value = min + ":" + sec;
+
+  id = setTimeout('runclk()', 1000);
+}
+
+/**************************************************************************************/
+function loadUp(_allcards) {
+  for (i1=0; i1<_allcards.length; i1++) { _allcards[i1] = i1+1; }
+  scrambleNew(_allcards);
+}
+
+/**************************************************************************************/
+// new version scrambles by assigning each cell a random number (2nd col).
+// then sorts by the random number and reload original array with the
+// sorted list (hence randomizing the list)
+function scrambleNew(_map) {
+
+  mapNew = new Array();
+  for (i1=0; i1<_map.length; i1++) {
+    mapNew[i1] = new Array(2);
+    mapNew[i1][0] = _map[i1];
+    mapNew[i1][1] = Math.floor(Math.random()*100);
+  }
+  mapNew.sort(compare2ndColumn);
+  for (i1=0; i1<_map.length; i1++) { _map[i1] = mapNew[i1][0]; }
+}
+
+/**************************************************************************************/
+// sort function used by scrambleNew above
+function compare2ndColumn(a, b) {
+  if (a[1] === b[1]) {
+    return 0;
+  } else {
+    return (a[1] < b[1]) ? -1 : 1;
+  }
+}
+
+function findotherimage(_but) {
+
+  for (i1=0;i1<map.length;i1++ )
+  {
+    if (map[i1] == map[_but] && i1 != _but)
+    {
+      gOtherCard = i1;
+    }
+  }
+}
+
+
+/**************************************************************************************/
+// this function is called when a tile is clicked
+// param: "but" is the image id (1 = top left, 100 = bottom right)
+function showimage(_this) {
+
+  document.f.b.focus();
+  but = _this.id.replace(/\D/g,'');
+
+  if (oktoclick) {
+    oktoclick = false; 
+    _imgAry[but].src = 'image'+map[but]+'.gif';
+	_imgAryX[ctr].src = 'image'+map[but]+'.gif';   // put image in preview pane also
+
+    if (ctr == 0) {
+      ctr++;
+      clickarray[0] = but;
+	  findotherimage(but);  // scam school
+      oktoclick = true;
+    } else {  // if ctr == 1
+      gOtherCard = -1	  
+      clickarray[1] = but;
+      ctr = 0;
+      setTimeout('returntoold()', /*2000*/ 600);
+    }
+  }
+}
+
+/**************************************************************************************/
+function returntoold() {
+  if ((clickarray[0] == clickarray[1]) && (!user[clickarray[0]])) { // if same tile clicked twice
+    _imgAry[clickarray[0]].src = "image0.gif";                      // then turn it back over
+
+	oktoclick = true;
+  } else {
+    if (map[clickarray[0]] != map[clickarray[1]]) {            // if first and second are DIFFERENT
+      if (user[clickarray[0]] == 0) {
+        _imgAry[clickarray[0]].src = "image0.gif";  // turn back over 1st
+      }
+      if (user[clickarray[1]] == 0) {
+        _imgAry[clickarray[1]].src = "image0.gif";  // and 2nd
+      }
+    }
+    if (map[clickarray[0]] == map[clickarray[1]]) {            // if first/second are SAME
+      if (user[clickarray[0]] == 0 &&user[clickarray[1]] == 0) { finished++; }
+
+      user[clickarray[0]] = 1;
+      user[clickarray[1]] = 1;
+
+	  if (removeTiles) {
+	    if (_noshrink) {
+          _imgAry[clickarray[1]].src = "imageblank.gif";
+          _imgAry[clickarray[0]].src = "imageblank.gif";
+        } else {
+          _imgAry[clickarray[0]].outerHTML = null;
+          _imgAry[clickarray[1]].outerHTML = null;
+		}
+	  }
+	  Gscam.innerHTML = "The JavaScript Source";
+    }
+    if (finished >= numTiles/2 ) {
+      alert('You did it in '+ document.f.b.value+' !  Hit Timer button to restart');
+//      init();
+    } else {
+      oktoclick = true;
+    }
+  }
+  _imgAryX[0].src = "imageblank.gif";   // blank both preview images
+  _imgAryX[1].src = "imageblank.gif";
+  
+
+}
+
+/**************************************************************************************/
+// utility functions to allow debugging (linked to show all and hide all buttons
+function ToggleAllTiles() {
+
+  for (i1=0; i1<numTiles; i1++) {
+    if ( user[i1]==0 ) {                                // only show/hide if undiscovered
+        _imgAry[i1].src = 'image'+ ((!GtilesVisible) ? map[i1] : 0) + '.gif';
+	}
+  }
+  GtilesVisible = !GtilesVisible;
+}
+
+/**************************************************************************************/
+function scamImage(_this) {
+//alert(_this.id);
+//alert(_this.src);
+
+  _x = _this.id.replace(/\D/g,'');
+  if (gOtherCard >= 0) {
+    _row0 = Math.floor(_x/rowWidth);
+    _col0 = _x % rowWidth;
+
+    _row1 = Math.floor(gOtherCard/rowWidth);
+    _col1 = gOtherCard % rowWidth;
+
+    if (_row0 == _row1 && _col0 == _col1) {
+	  Gscam.innerHTML = "The-JavaScript-Source";
+    } else if (_row0 == _row1) {
+	  Gscam.innerHTML = "The-JavaScript Source";
+    } else if (_col0 == _col1) {
+	  Gscam.innerHTML = "The JavaScript-Source";
+    } else {
+	  Gscam.innerHTML = "The JavaScript Source";
+    }
+  }
+
+}
+//  End -->
+/**************************************************************************************/
+
+</script>
+</HEAD>
+
+<body onload="init()">
+
+<center>
+<!-- <h2>Memory Game</h2>  -->
+<form name="f">
+<table border="0">
+<tr>
+<td>
+<table cellpadding="0" cellspacing="5" border="1">
+<script language="javascript">
+<!-- Begin
+//alert(Math.sqrt(numTiles));
+rowWidth = Math.sqrt(numTiles);
+colWidth = rowWidth;
+for (r = 0; r < rowWidth; r++) {
+  document.write('<tr>');
+  for (c = 0; c < colWidth; c++) {
+//    noshrinkStr = (_noshrink) ? '' : 'style="height:72px;width:72px;"';
+    noshrinkStr = '';
+//alert(noshrinkStr);
+    document.write('<td align="center"'+ noshrinkStr + '>');
+//    document.write('<a href="javascript:showimage('+((10*r)+c)+')" onClick="document.f.b.focus()">');
+    document.write('<img src="image0.gif" height="70px" width="70px" name="img0" id="id' +((rowWidth*r)+c)+ '" border="0" onclick="showimage(this)" onmouseover="scamImage(this)">');
+    document.write(/*'</a>*/'</td>');
+  }
+  document.write('</tr>');
+}
+// End -->
+</script>
+</table>
+</td><td>
+<table cellpadding="0" cellspacing="50" border="0">
+<script language="javascript">
+    document.write('<tr><td align="center">');
+    document.write('<img src="imageblank.gif" height="140px" width="140px" name="imgX" border="0">');
+    document.write('</td></tr><tr><td align="center">');
+    document.write('<img src="imageblank.gif" height="140px" width="140px" name="imgX" border="0">');
+    document.write('</td></tr>');
+
+</script>
+</table>
+</td>
+</table>
+<br>
+<input type="button" value="         " name="b" id="b" onClick="init()">
+</form>
+</center>
+
+<input type="button" value="Show/Hide" name="showall" onClick="ToggleAllTiles()"><br>
+<input type="checkbox" id="removecards" value="remove" CHECKED>remove tiles</input><br>
+<input type="checkbox" id="noshrink" value="noshrink" CHECKED>no shrink</input><br>
+
+<center>
+<font face="arial, helvetica" size="-2"><br>by <a id="scam" href="http://javascriptsource.com">The JavaScript Source</a></font>
+</center>
+
+<script>
+//redundant code
+
+/**************************************************************************************/
+// utility functions to allow debugging (linked to show all and hide all buttons
+/*
+function ShowAllTiles() {
+  for (i1=0; i1<numTiles; i1++) {
+    if ( user[i1]==0 ) {                                     // only show if undiscovered
+      _imgAry[i1].src = 'image'+map[i1]+'.gif';
+	}
+  }
+}
+*/
+
+/**************************************************************************************/
+/*
+function HideAllTiles() {
+  for (i1=0; i1<numTiles; i1++) {
+    if ( user[i1]==0 ) {                                     // only hide if undiscovered
+      _imgAry[i1].src = 'image0.gif';
+    }
+  }
+}
+*/
+
+
+</script>
+
+</body>
+</html>
