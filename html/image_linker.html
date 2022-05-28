@@ -1,0 +1,62 @@
+<!doctype html>
+
+<!-- see: http://ccgi.coldcall.plus.com/util/ls.php?folder=/services/webpages/util/c/c/ccgi.coldcall.plus.com/public/_ecbo/html  -->
+<!-- this page will get a image link for Frank from a google drive reference -->
+<!--   1. Find an image on Google Drive -->
+<!--   2. right-click and choose the 'get link' option -->
+<!--   3. Paste the link in the first input box -->
+<!--   4. Hit Transform -->
+<!--   5. Copy the result. This can be used as a linked image on any forum -->
+
+<html>
+<!-- google_drive_trans, Ben Grimer 12/01/22 -->
+
+<!-- Current Status : live  -->
+
+<head>
+<!-- <script type="text/javascript" src="../util/common/util_funcs.js"></script>  -->
+<style>
+span.head { font-size:150%; }
+span.small { font-size:75%; }
+div.cool { font-family: courier new; border: 1px solid black; padding: 10px; background:#eef; margin: 10px 0px; }
+</style>
+
+<title>Google drive image transform</title>
+<!-- <link rel="stylesheet" type="text/css" href="include/wt_styles.css" /> -->
+<!-- <script src="wt_common.js"></script> -->
+<script>
+
+function generate_table()
+{
+  var _orig_message   = document.getElementById('orig_message').value;
+  var _output_message = document.getElementById("output_message");
+  var _image_link     = document.getElementById("image_link");
+
+  const myArray = _orig_message.split("\/");
+  result = "https://drive.google.com/uc?export=view&id=" + myArray[5]
+  _output_message.value = result
+  _image_link.href = result
+  _image_link.text = "Working Image link"
+}
+
+</script>
+</head>
+<p>This program take a google drive image link and transforms it to be suitable as an SD image link<br/>
+<small>(Ben Grimer Jan 2022)</small>
+
+<!-- Paste the Google Drive image link in the box below: -->
+</p>
+Paste the Google Drive image link in the box below:<br>
+<textarea rows="3" cols="100" class="cool" id="orig_message">
+</textarea>
+<br><input TYPE="button" value="Transform" onclick="generate_table();" />
+
+<br/>
+<textarea rows="3" cols="100" class="cool" id="output_message">
+</textarea><br>
+<a id="image_link" href='http://test.com'>Non working image link</a>
+<br><br>
+ 
+</body>
+</html>
+

@@ -1,0 +1,88 @@
+<!doctype html>
+<html>
+<!-- comma_in_clause, Ben Grimer 11/02/20 -->
+<!-- This program converts a list of values for use in a SQL in clause -->
+
+<head>
+<title>Comma Columns</title>
+<link rel="stylesheet" href="/static/css/table_layout.css" type="text/css">
+<style>
+span.head { font-size:150%; }
+span.small { font-size:75%; }
+
+div.cool { font-family: courier new; border: 1px solid black; padding: 10px; background:#eef; margin: 10px 0px; }
+
+</style>
+<script>
+
+//var new_ary = [];											// used for diagnostics
+var out_ary = [];											// used to populate text area pretty print
+//var numcol = 0;
+//var colmax = [];    										// hold max length of string per column
+
+// ****************************************
+function generate_table()
+{
+  var _orig_message   = document.getElementById('orig_message').value;
+  var _output_message = document.getElementById("output_message");
+
+  var line_ary = _orig_message.split("\n");
+  out_ary = [];
+
+  out_ary.push("(");
+  for (i=0; i<line_ary.length; i++) {								// on 2nd pass format based on max column sizes
+
+    if (i>0) { out_ary.push(","); }
+    out_ary.push("'" + line_ary[i] + "'\n");
+
+  }
+  _output_message.value = out_ary.join("") + ")\n"
+
+}
+</script>
+</head>
+
+<body>
+<p>
+This page will convert a list of inputs to a SQL fragment suitable for use with an SQL in clause. It assumes that the entries are strings.
+</p>
+
+<br>
+string values to convert to IN CLAUSE<br>
+<textarea rows="12" cols="160" class="cool" id="orig_message">00145e00-434b-0000-0000-000000000000
+00145e02-de04-0000-0000-000000000000
+00145e01-3243-0000-0000-000000000000
+00145e01-9b79-0000-0000-000000000000
+00145e02-cb73-0000-0000-000000000000
+00145e01-93ea-0000-0000-000000000000
+00145e03-233b-0000-0000-000000000000
+00145e00-ca2f-0000-0000-000000000000
+001a64ef-11be-0000-0000-000000000000
+00145e01-2ce3-0000-0000-000000000000
+00145e04-1614-0000-0000-000000000000
+00215e7c-7c5f-0000-0000-000000000000
+00215e7c-16f2-0000-0000-000000000000
+00145e06-47fa-0000-0000-000000000000
+00145e06-23bc-0000-0000-000000000000
+00215e7c-68a5-0000-0000-000000000000
+00215e7c-6310-0000-0000-000000000000
+00145e05-78f6-0000-0000-000000000000
+00145e01-9392-0000-0000-000000000000
+00145e02-05d6-0000-0000-000000000000
+00145e06-4798-0000-0000-000000000000
+00145e02-76ee-0000-0000-000000000000
+00215e7c-62fa-0000-0000-000000000000
+00215e7c-6325-0000-0000-000000000000
+001a64ef-b944-0000-0000-000000000000</textarea>
+
+<br/><input TYPE="button" value="generate IN clause" onclick="generate_table();" /><br><br>
+ 
+<div class="sqltext" id="html_out">In clause will appear here ...</div>
+
+<textarea rows="12" cols="160" class="cool" id="output_message">generated in clause will appear here ...</textarea>
+
+ <br><br>
+ 
+</body>
+
+</html>

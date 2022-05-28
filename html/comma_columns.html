@@ -1,0 +1,166 @@
+<!doctype html>
+<html>
+<!-- Comma_columns, Ben Grimer 21/05/19 -->
+<!-- This program reformats comma delimited string data into prettyfield columns similar to PSQL terminal -->
+<!-- using comma delimited input -->
+<!-- 26/05/22 - button to switch tabs->commas and vice versa. Option to treat 1st line as header -->
+
+<head>
+<title>Comma Columns</title>
+
+<style>
+span.head { font-size:150%; }
+span.small { font-size:75%; }
+
+div.cool { font-family: courier new; border: 1px solid black; padding: 10px; background:#eef; margin: 10px 0px; }
+
+</style>
+<script>
+
+// see: https://stackoverflow.com/questions/2686855/is-there-a-javascript-function-that-can-pad-a-string-to-get-to-a-determined-leng/36247412
+String.prototype.padTrailSpace = function (numSpaces) {
+   return String(this + " ".repeat(numSpaces)).slice(0, numSpaces)
+};
+
+var new_ary = [];							// used for diagnostics
+var out_ary = [];							// used to populate text area pretty print
+var col_count = 0;
+var colmax = [];    							// hold max length of string per column
+var delim = ","
+
+// ****************************************
+function tabs_to_commas()
+{
+  var _orig_message   = document.getElementById('orig_message').value;
+  document.getElementById('orig_message').value = _orig_message.replace(/\t/g, ',');
+}
+// ****************************************
+function commas_to_tabs()
+{
+  var _orig_message   = document.getElementById('orig_message').value;
+  document.getElementById('orig_message').value = _orig_message.replace(/,/g, '\t');
+}
+
+
+// ****************************************
+// populates the columncount (number of columns) and
+// colmax (array of max length per column) global variables
+function gen_maxlength_ary(_lines)
+{
+  colmax = []
+  col_count = _lines[0].split(delim).length;
+  for (z=0; z<col_count; z++) { colmax.push(0) }			// initialise max for each column to zero's
+
+  for (i1=0; i1 <_lines.length; i1++) {					// loop to scan all rows for maxlength and save for later
+    rows = _lines[i1].split(delim)
+    for (j1=0; j1<col_count; j1++) {
+      if (rows[j1].length > colmax[j1]) { colmax[j1] = rows[j1].length }
+    }
+  }
+
+}
+
+
+// **********************************************************
+function gen_header_columns(_colmax, top_line, headercheck)
+{
+  header_elements = top_line.split(delim);
+
+  for (j1=0; j1 < _colmax.length; j1++) {					// header column with minuses and pluses
+    if (j1 > 0) { out_ary.push(" | ") } else { out_ary.push(" ") }
+    if (headercheck) {
+      out_ary.push(header_elements[j1].padTrailSpace(colmax[j1]) )
+    } else {
+      out_ary.push( " ".repeat(_colmax[j1]) )
+    }
+  }
+  out_ary.push("\n")
+
+  for (j1=0; j1<_colmax.length; j1++) {					// header column with minuses and pluses
+    if (j1>0) { out_ary.push("-+-") } else { out_ary.push("-") }
+    out_ary.push( "-".repeat(_colmax[j1]) )
+  }
+  out_ary.push("\n")
+}
+
+
+// ****************************************
+function generate_table()
+{
+  var _orig_message   = document.getElementById('orig_message').value;
+  var _output_message = document.getElementById("output_message");
+  var _headercheck = document.getElementById("header").checked;
+
+  var line_ary = _orig_message.split("\n");
+  new_ary = [];
+  out_ary = [];
+
+  gen_maxlength_ary(line_ary);
+  gen_header_columns(colmax, line_ary[0], _headercheck);
+
+  i1=0;
+  if (_headercheck) { i1=1; } else { i1=0; }
+
+  for (i=i1; i<line_ary.length; i++) {					// on 2nd pass format based on max column sizes
+    ary2 = line_ary[i].split(delim);
+
+    for (j1=0; j1<col_count; j1++) {
+      if (j1>0) { out_ary.push(" | ") } else { out_ary.push(" ") }
+      out_ary.push( ary2[j1].padTrailSpace(colmax[j1]) )
+    }
+    out_ary.push("\n")
+  }
+
+  new_ary.push("<pre>");
+  new_ary.push("col_count=" + col_count + "<br>");
+  new_ary.push("maxAry=" + colmax.join("|") + "<br>")			// diagnostic of max for all columns
+  new_ary.push("colmax.length=" + colmax.length + "<br>")		// colmax length TEMP
+  new_ary.push("</pre>");
+//alert(new_ary.join(""));
+
+  html_out.innerHTML = "<br/>" + new_ary.join("");
+  _output_message.value = out_ary.join("") // + ben_ary.join("");
+}
+</script>
+</head>
+
+<body>
+<p>
+This page generates prettyfied column output similar to the output produced by the psql terminal application.
+</p>
+
+<br>
+db code to convert<br>
+<textarea rows="12" cols="160" class="cool" id="orig_message">
+pos_terminal_uuid,branchname,count
+00012e42-3627-0000-0000-000000000000,Abergavenny,36
+00012e42-3627-0000-0000-000000000000,Abergavenny,36
+00012e5d-3bf5-0000-0000-000000000000,Abergavenny,26
+00012e5d-3c17-0000-0000-000000000000,Abergavenny,24
+00012e5c-75cd-0000-0000-000000000000,Abingdon,35
+00012e5d-3cb9-0000-0000-000000000000,Abingdon,10</textarea>
+
+<br/><input TYPE="button" value="generate" onclick="generate_table();" />
+<input TYPE="button" value="tabs->commas" onclick="tabs_to_commas();" />
+<input TYPE="button" value="commas->tabs" onclick="commas_to_tabs();" />
+<input type="checkbox" id="header" name="header" value="header" checked>Header ?<br><br>
+<textarea rows="12" cols="160" class="cool" id="output_message">Prettyprint results will appear here ...</textarea>
+<div class="sqltext" id="html_out">Diagnostics will appear here ...</div>
+<br><br>
+</body>
+<!--
+          pos_terminal_uuid           | branchname  | count
+--------------------------------------+-------------+-------
+ 00012e5c-7546-0000-0000-000000000000 | Abergavenny |     3
+ 00012e5c-754e-0000-0000-000000000000 | Abergavenny |    65
+ 00012e5d-3892-0000-0000-000000000000 | Abergavenny |    31
+ 00012e5d-3bf5-0000-0000-000000000000 | Abergavenny |    27
+ 00012e5d-3c17-0000-0000-000000000000 | Abergavenny |    24
+ 00012e5c-75cd-0000-0000-000000000000 | Abingdon    |    20
+ 00012e5d-3cb9-0000-0000-000000000000 | Abingdon    |    22
+ 00012e5d-3cc8-0000-0000-000000000000 | Abingdon    |    43
+ 00012e5d-3d05-0000-0000-000000000000 | Abingdon    |    21
+ 00012e5d-4812-0000-0000-000000000000 | Abingdon    |    10
+-->
+
+</html>
