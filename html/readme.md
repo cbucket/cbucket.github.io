@@ -27,3 +27,7 @@ to All.
 Paste the link in the input box and hit 'Transform' then
 copy the result.
 
+### onetimepad.html
+
+Simple html/javascript implementation of a onetimepad encryption.
+
