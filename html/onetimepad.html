@@ -1,0 +1,96 @@
+<!doctype html>
+<html>
+<head>
+<title>One Time Pad</title>
+<style>
+div { color: red; }
+div.cool { font-family: courier new; border: 1px solid black; padding: 10px; background:#eef; margin: 10px 0px; }
+</style>
+
+<script>
+// onetimepad - javascript functions
+// 07sep2012
+
+// encryption works as follows
+// take the ascii code each letter of the message in sequence, minus 32
+// same for the corresponding letter in the pad
+// add the 2 figures together
+// modulus 95 clock arithmetic (number of displayable ascii character)
+//   (note: 95 is the number of displayable ascii chars from <space> to <tilde>
+// finally, add 32 back on to make the encrypted letter displayable
+
+// this function en-crypts a message using the pad provided
+function doPadEncrypt() {
+
+  pad = document.getElementById('pad');
+  orig = document.getElementById('orig_message');
+  enc = document.getElementById('enc_message');
+
+  while ( orig.value.length > pad.value.length ) {  // duplicate the pad if its too short
+    document.getElementById('pad_dup').style.display = "inline";
+    pad.value += pad.value;                         // keep doubling the size of the pad till big enough
+  }
+
+  enc.value = encrypt(orig.value, pad.value);
+  decryptedValue = decrypt(enc.value, pad.value);
+
+  if (decryptedValue != orig.value) alert("*** ERROR *** : DECRYPTION DID NOT WORK !!");
+}
+
+function doPadDecrypt() {
+
+  pad = document.getElementById('pad');
+  orig = document.getElementById('orig_message');
+  enc = document.getElementById('enc_message');
+
+  while ( enc.value.length > pad.value.length ) {  // duplicate the pad if its too short
+    document.getElementById('pad_dup').style.display = "inline";
+    pad.value += pad.value;                         // keep doubling the size of the pad till big enough
+  }
+
+  orig.value = decrypt(enc.value, pad.value);
+}
+
+function encrypt(message, pad) {
+
+  var e_ary = new Array();
+
+  if ( message.length > pad.length )
+    alert ("*** WARNING *** Pad too short.  Results unpredictable");
+
+  for (i1=0; i1 < message.length; i1++) {
+    e_ary[i1] = String.fromCharCode(((message.charCodeAt(i1) + pad.charCodeAt(i1) - 64) % 95) + 32);
+  }
+  return(e_ary.join(""));  // return encrypted string
+}
+
+// this function de-crypts an already encrypted message (make sure the pad used in the same)
+// bug: now handles -ve numbers correctly by adding 95 before modulus
+function decrypt(e_message, pad) {
+
+  var d_ary = new Array();
+  for (i1=0; i1 < e_message.length; i1++) {
+    d_ary[i1] = String.fromCharCode( ((95 + e_message.charCodeAt(i1) - pad.charCodeAt(i1)) % 95) + 32);   // do the 32's cancel ?
+  }
+  return(d_ary.join(""));  // return decrypted string
+}
+</script>
+</head>
+
+<body>
+<h1>One Time Pad - Ben Grimer 07/09/2012</h1>
+
+Pad <span style="display:none; color:red" id="pad_dup">(PAD DUPLICATED)</span><br>
+<textarea rows="4" cols="80" class="cool" id="pad">pad here ...</textarea>
+<br>Message<br>
+<textarea rows="4" cols="80" class="cool" id="orig_message">message here ...</textarea>
+<br>Encrypted<br>
+<textarea rows="4" cols="80" class="cool" id="enc_message">encrypted here ...</textarea>
+
+<br>
+<input TYPE="button" value="encrypt" onclick="doPadEncrypt();" />&nbsp;
+<input TYPE="button" value="decrypt" onclick="doPadDecrypt();" /><br>
+<br>
+
+</body>
+</html>
