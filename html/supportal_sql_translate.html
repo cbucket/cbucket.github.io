@@ -1,0 +1,92 @@
+<!doctype html>
+<html>
+<!-- supportal_sql_translate, Ben Grimer 30/05/22 -->
+<!-- this program takes some SQL from the base/supportal/sql folder -->
+<!-- and replaces the ruby scriptlet elments with elements suitable -->
+<!-- to used with Navicat -->
+
+<head>
+<title>Supportal SQL Translate</title>
+
+<style>
+span.head { font-size:150%; }
+span.small { font-size:75%; }
+
+div.cool { font-family: courier new; border: 1px solid black; padding: 10px; background:#eef; margin: 10px 0px; }
+
+</style>
+<script>
+var new_ary = [];							// used for diagnostics
+var out_ary = [];							// used to populate text area pretty print
+
+// ****************************************
+function remove_percent_lines()
+{
+  new_ary = [];
+  out_ary = [];
+  var _orig_message   = document.getElementById('orig_message').value;
+  var _output_message = document.getElementById("output_message");
+  var _limitkeep = document.getElementById("limit").checked;
+  var _diagnostics = document.getElementById("diagnostics").checked;
+
+  var lines = _orig_message.split("\n");
+  for (i1=0; i1<lines.length; i1++) {
+
+    line = lines[i1].trim();
+    first3 = line.substring(0,3);
+    if ( first3 != "<% " && (first3 != "LIM" || _limitkeep) ) {
+
+      if ( "elements" == line.match(/elements/) ) {
+        elements = line.split(/'{0,1}<%= elements\[:'{0,1}/);     // identifies ruby tag (with & without quotes)
+        new_ary.push("elements [0]=>" + elements[0] + "< <br>");    // alert("elements [0]=>" + elements[0] +"<");
+        new_ary.push("elements [1]=>" + elements[1] + "< <br>");    // alert("elements [1]=>" + elements[1] +"<");
+        var_name = elements[1].split("]")[0];
+        new_ary.push("var_name =>" + var_name + "< <br>");        // alert("var_name =>" + var_name +"<");
+        line2 = elements[0] + "[$" + var_name + "]"
+        out_ary.push( line2 + "\n");
+      } else {
+        out_ary.push( line + "\n");
+      }
+
+    }
+  }
+  out_ary.push("\n")
+  _output_message.value = out_ary.join("")
+  if (_diagnostics) html_out.innerHTML = "<u>Diagnostics</u><br/>" + new_ary.join(""); else html_out.innerHTML = "";
+}
+</script>
+</head>
+
+<body>
+<p>
+This program takes some SQL from the base/supportal/sql folder
+and replaces the ruby scriptlet elments with elements suitable
+to used with Navicat.<br>
+<small>(Ben Grimer 30/05/22)</small><br>
+</p>
+
+<br>
+db code to convert<br>
+<textarea rows="12" cols="160" class="cool" id="orig_message">
+SELECT prb.promotion_id, rb.name, rb.branch_name, p.status
+FROM  promotions_retailer_branches prb
+INNER JOIN retailer_branches rb on prb.retailer_branch_id = rb.id
+INNER JOIN promotions p on prb.promotion_id = p.id
+<% if elements[:rb_name].present? %>
+ WHERE rb.name = '<%= elements[:rb_name] %>'
+<% end %>
+<% if elements[:limit].present? %>
+ LIMIT <%= elements[:limit] %>
+<% end %>
+</textarea>
+
+<br/><input TYPE="button" value="generate" onclick="remove_percent_lines();" />
+<input type="checkbox" id="limit" value="limit" CHECKED>Limit ?
+<input type="checkbox" id="diagnostics" value="diagnostics" CHECKED>Diagnostics ?<br><br>
+
+<br><br>
+<textarea rows="12" cols="160" class="cool" id="output_message">Prettyprint results will appear here ...</textarea>
+<div class="sqltext" id="html_out">Diagnostics will appear here ...</div>
+<br><br>
+</body>
+</html>
