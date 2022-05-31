@@ -1,0 +1,524 @@
+<!doctype html>
+<html>
+<!-- tracelog_trans, Ben Grimer 15/07/19 -->
+<!-- This program takes an MCORE tracelog in the keyword substituted format and then -->
+<!-- adds back the the keywords (based on the list provided by RichardE on 05/07/19  -->
+<!-- 15/07/19 - v0.01 - draft version -->
+<!-- 16/07/19 - v1.0 - works with RichardE provided keywords and test transaction -->
+
+<!-- Current Status : live  -->
+
+<head>
+<!-- <script type="text/javascript" src="../util/common/util_funcs.js"></script>  -->
+<style>
+span.head { font-size:150%; }
+span.small { font-size:75%; }
+div.cool { font-family: courier new; border: 1px solid black; padding: 10px; background:#eef; margin: 10px 0px; }
+</style>
+
+<title>Tracelog transform</title>
+<!-- <link rel="stylesheet" type="text/css" href="include/wt_styles.css" /> -->
+<!-- <script src="wt_common.js"></script> -->
+<script>
+
+// see: https://stackoverflow.com/questions/1144705/best-way-to-store-a-key-value-array-in-javascript/1144737
+var myKeywords = {"mName": "method name"
+  , "dmy": "day / month / year"
+  ,"op": "operator"
+  ,"pType": "promotion type"
+  ,"slpc": "serve limit per customer"
+  ,"slpp": "serve limit per promotion"
+  ,"slps": "serve limit per store"
+  ,"pV": "promotion value"
+  ,"tV": "transaction value"};
+
+function init() {
+//  console.log('init called ...');
+}
+
+function generate_table()
+{
+  var _orig_message   = document.getElementById('orig_message').value;
+  var _output_message = document.getElementById("output_message");
+
+  for (var key in myKeywords) {
+//console.log("key=>" + key + "<. Keyword=>" + myKeywords[key] + "<");
+    _orig_message = _orig_message.split(key).join(myKeywords[key]);
+  }
+  _output_message.value = _orig_message;
+}
+
+</script>
+</head>
+<body onload="init()">
+<p>This program takes an MCORE tracelog in the keyword substituted format and then adds back the the keywords (v1.0 - 16/07/19)<br/>
+<small>(Ben Grimer Jul 2019)</small>
+</p>
+
+<br>
+Paste transaction trace log in place of example below:<br>
+<textarea rows="12" cols="160" class="cool" id="orig_message">
+{
+  "filter": {
+    "retailerId": 89,
+    "channelTypeId": 1,
+    "storeId": "729"
+  },
+  "selectedPromotions": [
+    1,
+    2,
+    3,
+    4,
+    5
+  ],
+  "matchedPromotions": [
+    31
+  ],
+  "prioritizedPromotions": [
+    31
+  ],
+  "triggeredPromotions": [
+    31
+  ],
+  "promotions": {
+    "1": {
+      "pType": 0,
+      "match": false,
+      "reason": {
+        "code": "P003"
+      },
+      "triggers": [
+        {
+          "id": 1,
+          "op": "&&",
+          "match": true,
+          "triggerNodes": [
+            {
+              "id": 1,
+              "match": true,
+              "pV": {
+                "dmy": "14/06/2017",
+                "time": "00:00:00:0"
+              },
+              "tV": {
+                "dmy": "01/01/2019",
+                "time": "02:15:00:183224000"
+              },
+              "name": "date_start",
+              "op": "<=",
+              "type": "date",
+              "mName": "getCurrentDate"
+            },
+            {
+              "id": 2,
+              "match": true,
+              "pV": {
+                "dmy": "14/06/2021",
+                "time": "23:59:59:0"
+              },
+              "tV": {
+                "dmy": "01/01/2019",
+                "time": "02:15:00:183224000"
+              },
+              "name": "date_start",
+              "op": ">=",
+              "type": "date",
+              "mName": "getCurrentDate"
+            }
+          ]
+        },
+        {
+          "id": 2,
+          "op": "&&",
+          "match": false,
+          "triggerNodes": [
+            {
+              "id": 3,
+              "match": false,
+              "pV": [
+                497
+              ],
+              "tV": [
+                "0031-0026370-i"
+              ],
+              "name": "loyalty_numbers",
+              "op": "IN DB",
+              "type": "integer",
+              "mName": "getLoyaltyCardNumbers"
+            }
+          ]
+        }
+      ]
+    },
+    "2": {
+      "pType": 0,
+      "match": false,
+      "reason": {
+        "code": "P003"
+      },
+      "triggers": [
+        {
+          "id": 3,
+          "op": "&&",
+          "match": true,
+          "triggerNodes": [
+            {
+              "id": 4,
+              "match": true,
+              "pV": {
+                "dmy": "14/06/2017",
+                "time": "00:00:00:0"
+              },
+              "tV": {
+                "dmy": "01/01/2019",
+                "time": "02:15:00:183224000"
+              },
+              "name": "date_start",
+              "op": "<=",
+              "type": "date",
+              "mName": "getCurrentDate"
+            },
+            {
+              "id": 5,
+              "match": true,
+              "pV": {
+                "dmy": "14/06/2021",
+                "time": "23:59:59:0"
+              },
+              "tV": {
+                "dmy": "01/01/2019",
+                "time": "02:15:00:183224000"
+              },
+              "name": "date_start",
+              "op": ">=",
+              "type": "date",
+              "mName": "getCurrentDate"
+            }
+          ]
+        },
+        {
+          "id": 4,
+          "op": "&&",
+          "match": false,
+          "triggerNodes": [
+            {
+              "id": 6,
+              "match": false,
+              "pV": [
+                498
+              ],
+              "tV": [
+                "0031-0026370-i"
+              ],
+              "name": "loyalty_numbers",
+              "op": "IN DB",
+              "type": "integer",
+              "mName": "getLoyaltyCardNumbers"
+            }
+          ]
+        }
+      ]
+    },
+    "3": {
+      "pType": 0,
+      "match": false,
+      "reason": {
+        "code": "P003"
+      },
+      "triggers": [
+        {
+          "id": 5,
+          "op": "&&",
+          "match": true,
+          "triggerNodes": [
+            {
+              "id": 7,
+              "match": true,
+              "pV": {
+                "dmy": "14/06/2017",
+                "time": "00:00:00:0"
+              },
+              "tV": {
+                "dmy": "01/01/2019",
+                "time": "02:15:00:183224000"
+              },
+              "name": "date_start",
+              "op": "<=",
+              "type": "date",
+              "mName": "getCurrentDate"
+            },
+            {
+              "id": 8,
+              "match": true,
+              "pV": {
+                "dmy": "14/06/2021",
+                "time": "23:59:59:0"
+              },
+              "tV": {
+                "dmy": "01/01/2019",
+                "time": "02:15:00:183224000"
+              },
+              "name": "date_start",
+              "op": ">=",
+              "type": "date",
+              "mName": "getCurrentDate"
+            }
+          ]
+        },
+        {
+          "id": 6,
+          "op": "&&",
+          "match": false,
+          "triggerNodes": [
+            {
+              "id": 9,
+              "match": false,
+              "pV": [
+                499
+              ],
+              "tV": [
+                "0031-0026370-i"
+              ],
+              "name": "loyalty_numbers",
+              "op": "IN DB",
+              "type": "integer",
+              "mName": "getLoyaltyCardNumbers"
+            }
+          ]
+        }
+      ]
+    },
+    "4": {
+      "pType": 0,
+      "match": false,
+      "reason": {
+        "code": "P003"
+      },
+      "triggers": [
+        {
+          "id": 7,
+          "op": "&&",
+          "match": true,
+          "triggerNodes": [
+            {
+              "id": 10,
+              "match": true,
+              "pV": {
+                "dmy": "14/06/2017",
+                "time": "00:00:00:0"
+              },
+              "tV": {
+                "dmy": "01/01/2019",
+                "time": "02:15:00:183224000"
+              },
+              "name": "date_start",
+              "op": "<=",
+              "type": "date",
+              "mName": "getCurrentDate"
+            },
+            {
+              "id": 11,
+              "match": true,
+              "pV": {
+                "dmy": "14/06/2021",
+                "time": "23:59:59:0"
+              },
+              "tV": {
+                "dmy": "01/01/2019",
+                "time": "02:15:00:183224000"
+              },
+              "name": "date_start",
+              "op": ">=",
+              "type": "date",
+              "mName": "getCurrentDate"
+            }
+          ]
+        },
+        {
+          "id": 8,
+          "op": "&&",
+          "match": false,
+          "triggerNodes": [
+            {
+              "id": 12,
+              "match": false,
+              "pV": [
+                500
+              ],
+              "tV": [
+                "0031-0026370-i"
+              ],
+              "name": "loyalty_numbers",
+              "op": "IN DB",
+              "type": "integer",
+              "mName": "getLoyaltyCardNumbers"
+            }
+          ]
+        }
+      ]
+    },
+    "5": {
+      "pType": 0,
+      "match": false,
+      "reason": {
+        "code": "P003"
+      },
+      "triggers": [
+        {
+          "id": 9,
+          "op": "&&",
+          "match": true,
+          "triggerNodes": [
+            {
+              "id": 13,
+              "match": true,
+              "pV": {
+                "dmy": "14/06/2017",
+                "time": "00:00:00:0"
+              },
+              "tV": {
+                "dmy": "01/01/2019",
+                "time": "02:15:00:183224000"
+              },
+              "name": "date_start",
+              "op": "<=",
+              "type": "date",
+              "mName": "getCurrentDate"
+            },
+            {
+              "id": 14,
+              "match": true,
+              "pV": {
+                "dmy": "14/06/2021",
+                "time": "23:59:59:0"
+              },
+              "tV": {
+                "dmy": "01/01/2019",
+                "time": "02:15:00:183224000"
+              },
+              "name": "date_start",
+              "op": ">=",
+              "type": "date",
+              "mName": "getCurrentDate"
+            }
+          ]
+        },
+        {
+          "id": 10,
+          "op": "&&",
+          "match": false,
+          "triggerNodes": [
+            {
+              "id": 15,
+              "match": false,
+              "pV": [
+                501
+              ],
+              "tV": [
+                "0031-0026370-i"
+              ],
+              "name": "loyalty_numbers",
+              "op": "IN DB",
+              "type": "integer",
+              "mName": "getLoyaltyCardNumbers"
+            }
+          ]
+        }
+      ]
+    },
+    "31": {
+      "pType": 0,
+      "slpc": true,
+      "slpp": true,
+      "triggers": [
+        {
+          "id": 61,
+          "op": "&&",
+          "match": true,
+          "triggerNodes": [
+            {
+              "id": 91,
+              "match": true,
+              "pV": {
+                "dmy": "14/06/2017",
+                "time": "00:00:00:0"
+              },
+              "tV": {
+                "dmy": "01/01/2019",
+                "time": "02:15:00:183224000"
+              },
+              "name": "date_start",
+              "op": "<=",
+              "type": "date",
+              "mName": "getCurrentDate"
+            },
+            {
+              "id": 92,
+              "match": true,
+              "pV": {
+                "dmy": "14/06/2021",
+                "time": "23:59:59:0"
+              },
+              "tV": {
+                "dmy": "01/01/2019",
+                "time": "02:15:00:183224000"
+              },
+              "name": "date_start",
+              "op": ">=",
+              "type": "date",
+              "mName": "getCurrentDate"
+            }
+          ]
+        },
+        {
+          "id": 62,
+          "op": "&&",
+          "match": true,
+          "triggerNodes": [
+            {
+              "id": 93,
+              "match": true,
+              "pV": [
+                527
+              ],
+              "tV": [
+                "0031-0026370-i"
+              ],
+              "name": "loyalty_numbers",
+              "op": "IN DB",
+              "type": "integer",
+              "mName": "getLoyaltyCardNumbers"
+            }
+          ]
+        }
+      ]
+    }
+  },
+  "transactionValues": {
+    "getCurrentDate": {
+      "value": {
+        "dmy": "01/01/2019",
+        "time": "02:15:00:183224000"
+      }
+    },
+    "getLoyaltyCardNumbers": {
+      "value": [
+        "0031-0026370-i"
+      ]
+    }
+  }
+}
+</textarea>
+
+<br/><input TYPE="button" value="Transform" onclick="generate_table();" />
+
+<br/><br/>
+<div class="heading"><u>Results shown below</u></div>
+<br/>
+
+<textarea rows="12" cols="160" class="cool" id="output_message">translated trace log will appear here ..</textarea>
+
+ <br><br>
+ 
+</body>
+</html>

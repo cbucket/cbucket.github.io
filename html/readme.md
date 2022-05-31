@@ -16,7 +16,7 @@ This page will convert a list of inputs to a SQL fragment
 suitable for use with an SQL in clause. It assumes that the 
 entries are strings.
 
-### Image_linker.html
+### image_linker.html
 This is something I put together quickly for Dad.
 It allows one to use an image file saved to a google drive
 account as a link in Suscipe Domine.
@@ -28,6 +28,8 @@ Paste the link in the input box and hit 'Transform' then
 copy the result.
 
 ### onetimepad.html
-
 Simple html/javascript implementation of a onetimepad encryption.
 
+### tracelog_trans.html
+This program takes an MCORE tracelog in the keyword substituted format and then
+adds back the the keywords (based on the list provided by RichardE on 05/07/19)
