@@ -5,10 +5,6 @@
 
 // v1.00 30/03/15 - basic functionality works
 // v1.01          - added flexi-grid size
-// v1.02          - test button and init2()
-
-// status: init2() function incomplete. It is supposed to allow redrawing of grid to different sizes but
-//         currently it seems to be in a 4x4 experimental stage.
 
 /* bugs
 
@@ -41,40 +37,6 @@ var gOtherCard = -1;
 //var Gchar=":";
 var GtilesVisible = false;
 var Gscam;
-var GgridTable;
-var GgridTable2;
-var GstartButton;
-
-/**************************************************************************************/
-// sets up the game
-function init2() {
-alert(GgridTable.innerHTML);
-alert("kill programX!");
-//GgridTable2.innerHTML = "Be
-n Grimer"; // was 'Ben Grimer'
-//alert("this should not happen!");
-
-  _innerHTMLary = new Array();
-alert("L:"+_innerHTMLary.length);
-
-  rowWidth = Math.sqrt(16);
-  colWidth = rowWidth;
-  for (r1 = 0; r1 < rowWidth; r1++) {
-    _innerHTMLary.push('<tr>');
-    for (c1 = 0; c1 < colWidth; c1++) {
-
-      _innerHTMLary.push('<td align="center">');
-      _innerHTMLary.push('<img src="image0.gif" height="70px" width="70px" name="img0" id="id' +((rowWidth*r1)+c1)+ '" border="0" onclick="showimage(this)" onmouseover="scamImage(this)">');
-      _innerHTMLary.push('</td>');
-    }
-    _innerHTMLary.push('</tr>');
-  }
-  alert(_innerHTMLary.length + "|" + _innerHTMLary[_innerHTMLary.length-1]);
-//GgridTable.innerHTML = "Ben Grimer";
-//  GgridTable.innerHTML = _innerHTMLary.join("");
-  alert(_innerHTMLary.join("")/*GgridTable.innerHTML*/);
-}
-
 
 /**************************************************************************************/
 // sets up the game
@@ -85,11 +47,6 @@ function init() {
   _imgAry = document.getElementsByName("img0");
   _imgAryX = document.getElementsByName("imgX");
   Gscam = document.getElementById("scam");
-  GgridTable = document.getElementById("gridtable");
-  GgridTable2 = document.getElementById("gridtable2");
-
-//alert("boo>" + GgridTable.innerHTML);
-  GstartButton = document.getElementById("b");
 
   clearTimeout(id);
   for (i = 0; i < numTiles ;i++) { user[i] = 0; }  // initially, all tiles not found
@@ -129,7 +86,7 @@ function runclk() {
   min = Math.floor(ticker/60);
   sec = (ticker-(min*60))+'';
   if(sec.length == 1) {sec = "0"+sec};
-  
+
   ticker++;
   _timerButton.value = min + ":" + sec;
 
@@ -168,13 +125,13 @@ function compare2ndColumn(a, b) {
   }
 }
 
-
 function findotherimage(_but) {
 
-  for (i1=0;i1<map.length;i1++ ) {
-    if (map[i1] == map[_but] && i1 != _but) {
+  for (i1=0;i1<map.length;i1++ )
+  {
+    if (map[i1] == map[_but] && i1 != _but)
+    {
       gOtherCard = i1;
-	  break;            // once other card found, no need to continue searching !
     }
   }
 }
@@ -185,12 +142,11 @@ function findotherimage(_but) {
 // param: "but" is the image id (1 = top left, 100 = bottom right)
 function showimage(_this) {
 
-  GstartButton.focus();
-//  document.f.b.focus();
+  document.f.b.focus();
   but = _this.id.replace(/\D/g,'');
 
   if (oktoclick) {
-    oktoclick = false; 
+    oktoclick = false;
     _imgAry[but].src = 'image'+map[but]+'.gif';
 	_imgAryX[ctr].src = 'image'+map[but]+'.gif';   // put image in preview pane also
 
@@ -200,7 +156,7 @@ function showimage(_this) {
 	  findotherimage(but);  // scam school
       oktoclick = true;
     } else {  // if ctr == 1
-      gOtherCard = -1	  
+      gOtherCard = -1
       clickarray[1] = but;
       ctr = 0;
       setTimeout('returntoold()', /*2000*/ 600);
@@ -241,9 +197,7 @@ function returntoold() {
 	  Gscam.innerHTML = "The JavaScript Source";
     }
     if (finished >= numTiles/2 ) {
-      alert('You did it in '+ GstartButton.value+' !  Hit Timer button to restart');
-//      alert('You did it in '+ document.f.b.value+' !  Hit Timer button to restart');
-
+      alert('You did it in '+ document.f.b.value+' !  Hit Timer button to restart');
 //      init();
     } else {
       oktoclick = true;
@@ -251,7 +205,7 @@ function returntoold() {
   }
   _imgAryX[0].src = "imageblank.gif";   // blank both preview images
   _imgAryX[1].src = "imageblank.gif";
-  
+
 
 }
 
@@ -306,7 +260,7 @@ function scamImage(_this) {
 <table border="0">
 <tr>
 <td>
-<table id="gridtable" cellpadding="0" cellspacing="5" border="1">
+<table cellpadding="0" cellspacing="5" border="1">
 <script language="javascript">
 <!-- Begin
 //alert(Math.sqrt(numTiles));
@@ -315,10 +269,11 @@ colWidth = rowWidth;
 for (r = 0; r < rowWidth; r++) {
   document.write('<tr>');
   for (c = 0; c < colWidth; c++) {
-
+//    noshrinkStr = (_noshrink) ? '' : 'style="height:72px;width:72px;"';
     noshrinkStr = '';
-    document.write('<td align="center">');
-
+//alert(noshrinkStr);
+    document.write('<td align="center"'+ noshrinkStr + '>');
+//    document.write('<a href="javascript:showimage('+((10*r)+c)+')" onClick="document.f.b.focus()">');
     document.write('<img src="image0.gif" height="70px" width="70px" name="img0" id="id' +((rowWidth*r)+c)+ '" border="0" onclick="showimage(this)" onmouseover="scamImage(this)">');
     document.write(/*'</a>*/'</td>');
   }
@@ -328,14 +283,15 @@ for (r = 0; r < rowWidth; r++) {
 </script>
 </table>
 </td><td>
-<table id="gridtable2" cellpadding="0" cellspacing="50" border="0">
+<table cellpadding="0" cellspacing="50" border="0">
+<script language="javascript">
+    document.write('<tr><td align="center">');
+    document.write('<img src="imageblank.gif" height="140px" width="140px" name="imgX" border="0">');
+    document.write('</td></tr><tr><td align="center">');
+    document.write('<img src="imageblank.gif" height="140px" width="140px" name="imgX" border="0">');
+    document.write('</td></tr>');
 
-<tr><td align="center">
-<img src="imageblank.gif" height="140px" width="140px" name="imgX" border="0">
-</td></tr><tr><td align="center">
-<img src="imageblank.gif" height="140px" width="140px" name="imgX" border="0">
-</td></tr>
-
+</script>
 </table>
 </td>
 </table>
@@ -347,13 +303,6 @@ for (r = 0; r < rowWidth; r++) {
 <input type="button" value="Show/Hide" name="showall" onClick="ToggleAllTiles()"><br>
 <input type="checkbox" id="removecards" value="remove" CHECKED>remove tiles</input><br>
 <input type="checkbox" id="noshrink" value="noshrink" CHECKED>no shrink</input><br>
-<select>
-  <option value="10">10 X 10</option>
-  <option value="8">8 X 8</option>
-  <option value="6">6 X 6</option>
-  <option value="4">4 X 4</option>
-</select>
-<input type="button" value="test" id="test1" onClick="init2()">
 
 <center>
 <font face="arial, helvetica" size="-2"><br>by <a id="scam" href="http://javascriptsource.com">The JavaScript Source</a></font>
@@ -361,14 +310,6 @@ for (r = 0; r < rowWidth; r++) {
 
 <script>
 //redundant code
-
-/*
-    document.write('<tr><td align="center">');
-    document.write('<img src="imageblank.gif" height="140px" width="140px" name="imgX" border="0">');
-    document.write('</td></tr><tr><td align="center">');
-    document.write('<img src="imageblank.gif" height="140px" width="140px" name="imgX" border="0">');
-    document.write('</td></tr>');
-*/
 
 /**************************************************************************************/
 // utility functions to allow debugging (linked to show all and hide all buttons
