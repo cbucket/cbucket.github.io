@@ -36,7 +36,7 @@ function remove_percent_lines()
     first3 = line.substring(0,3);
     if ( first3 != "<% " && (first3 != "LIM" || _limitkeep) ) {
 
-      if ( "elements" == line.match(/elements/) ) {
+      if ( "elements[" == line.match(/elements\[/) ) {
         elements = line.split(/'{0,1}<%= elements\[:'{0,1}/);     // identifies ruby tag (with & without quotes)
         new_ary.push("elements [0]=>" + elements[0] + "< <br>");    // alert("elements [0]=>" + elements[0] +"<");
         new_ary.push("elements [1]=>" + elements[1] + "< <br>");    // alert("elements [1]=>" + elements[1] +"<");
