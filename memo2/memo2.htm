@@ -230,13 +230,13 @@ function scamImage(_this) {
 //alert(_this.id);
 //alert(_this.src);
 
-  _x = _this.id.replace(/\D/g,'');
+  _idDigits = _this.id.replace(/\D/g,'');     // remove any character NOT a digit
   if (gOtherCard >= 0) {
-    _row0 = Math.floor(_x/rowWidth);
-    _col0 = _x % rowWidth;
+    _row0 = Math.floor(_idDigits/colWidth);
+    _col0 = _idDigits % colWidth;
 
-    _row1 = Math.floor(gOtherCard/rowWidth);
-    _col1 = gOtherCard % rowWidth;
+    _row1 = Math.floor(gOtherCard/colWidth);
+    _col1 = gOtherCard % colWidth;
 
     if (_row0 == _row1 && _col0 == _col1) {
 	  Gscam.innerHTML = "The-JavaScript-Source";
