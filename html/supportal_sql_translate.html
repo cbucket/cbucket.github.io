@@ -2,7 +2,7 @@
 <html>
 <!-- supportal_sql_translate, Ben Grimer 30/05/22 -->
 <!-- this program takes some SQL from the base/supportal/sql folder -->
-<!-- and replaces the ruby scriptlet elments with elements suitable -->
+<!-- and replaces the ruby scriptlet elements with elements suitable -->
 <!-- to used with Navicat -->
 
 <head>
@@ -33,18 +33,24 @@ function remove_percent_lines()
   var lines = _orig_message.split("\n");
   for (i1=0; i1<lines.length; i1++) {
     _exclude=false;
+    _special_case=false;
+
     line = lines[i1].trim();
     first3 = line.substring(0,3);
     if ( first3 == "LIM" && !_limitkeep )       { _exclude=true; }
     if ( line.match(/\(Array\)/) == "(Array)" ) { _exclude=true; }  // ignore line containing kind_of?(Array)
     if ( first3 == "<% " )                      { _exclude=true; }
     if ( first3 == "<%#" )                      { _exclude=true; }
-    if ( line.match(/with inputs/) == "with inputs" && line.match(/\.join/) == ".join")
-      { _exclude=true; }                                           // remove duplicate with for tags
+    if ( line.match(/with inputs/) == "with inputs") {
+      if (line.match(/\.join/) == ".join") { _exclude=true; }       // remove duplicate with for tags
+      _special_case = true;
+    }
 
     if ( !_exclude ) {
-
-      if ( "elements[" == line.match(/elements\[/) ) {
+      if (_special_case) {
+        line2 = line.replace(/'{0,1}<%= elements\[:item_list\] %>'{0,1}/g, "[$item_list]");
+        out_ary.push( line2 + "\n");
+      } else if ( "elements[" == line.match(/elements\[/) ) {
         elements = line.split(/'{0,1}<%= elements\[:'{0,1}/);     // identifies ruby tag (with & without quotes)
         new_ary.push("elements [0]=>" + elements[0] + "< <br>");    // alert("elements [0]=>" + elements[0] +"<");
         new_ary.push("elements [1]=>" + elements[1] + "< <br>");    // alert("elements [1]=>" + elements[1] +"<");
@@ -68,7 +74,7 @@ function remove_percent_lines()
 <body>
 <p>
 This program takes some SQL from the base/supportal/sql folder
-and replaces the ruby scriptlet elments with elements suitable
+and replaces the ruby scriptlet elements with elements suitable
 to used with Navicat.<br>
 <small>(Ben Grimer 30/05/22)</small><br>
 </p>
