@@ -28,13 +28,21 @@ function remove_percent_lines()
   var _output_message = document.getElementById("output_message");
   var _limitkeep = document.getElementById("limit").checked;
   var _diagnostics = document.getElementById("diagnostics").checked;
+  var _exclude=false;
 
   var lines = _orig_message.split("\n");
   for (i1=0; i1<lines.length; i1++) {
-
+    _exclude=false;
     line = lines[i1].trim();
     first3 = line.substring(0,3);
-    if ( first3 != "<% " && (first3 != "LIM" || _limitkeep) ) {
+    if ( first3 == "LIM" && !_limitkeep )       { _exclude=true; }
+    if ( line.match(/\(Array\)/) == "(Array)" ) { _exclude=true; }  // ignore line containing kind_of?(Array)
+    if ( first3 == "<% " )                      { _exclude=true; }
+    if ( first3 == "<%#" )                      { _exclude=true; }
+    if ( line.match(/with inputs/) == "with inputs" && line.match(/\.join/) == ".join")
+      { _exclude=true; }                                           // remove duplicate with for tags
+
+    if ( !_exclude ) {
 
       if ( "elements[" == line.match(/elements\[/) ) {
         elements = line.split(/'{0,1}<%= elements\[:'{0,1}/);     // identifies ruby tag (with & without quotes)
@@ -68,15 +76,40 @@ to used with Navicat.<br>
 <br>
 db code to convert<br>
 <textarea rows="12" cols="160" class="cool" id="orig_message">
-SELECT prb.promotion_id, rb.name, rb.branch_name, p.status
-FROM  promotions_retailer_branches prb
-INNER JOIN retailer_branches rb on prb.retailer_branch_id = rb.id
-INNER JOIN promotions p on prb.promotion_id = p.id
-<% if elements[:rb_name].present? %>
- WHERE rb.name = '<%= elements[:rb_name] %>'
+<%if elements[:item_list].kind_of?(Array) %>
+  <%# this means it is a tag element %>
+  with inputs as (select string_to_array('<%= elements[:item_list].join(",") %>', ',') as input_items)
+<% else %>
+  <%# otherwise treat as a StringSingle %>
+  with inputs as (select string_to_array('<%= elements[:item_list] %>', ',') as input_items)
 <% end %>
+
+,list_sale_items as (
+  select transaction_uuid
+    , to_char(created_at, 'YYYY-MM-DD HH24:MI:SS.MS') as created_at
+    , (xpath('//ns7:UnitID/text()', convert_from(data,'utf8')::xml, '{{ns7,http://www.nrf-arts.org/IXRetail/namespace/}}'))[1]::text "UnitID"
+    , (xpath('//ns7:Sale/ns7:ItemID/text()', convert_from(data,'utf8')::xml, '{{ns7,http://www.nrf-arts.org/IXRetail/namespace/} }')::text[]) as sale_items
+  from mcore5_app_requests, inputs
+<% if elements[:date].present? %>
+  WHERE created_at BETWEEN '<%= elements[:date] %>'::timestamp  AND '<%= elements[:date] %>'::timestamp + INTERVAL '1 DAY'
+<% end %>
+<% if elements[:date].present? && elements[:time_of_day].present? %>
+  AND created_at BETWEEN '<%= elements[:date] %> <%= elements[:time_of_day][:"0"][:value] %>:00+00' AND '<%= elements[:date] %> <%= elements[:time_of_day][:"1"][:value] %>:00+00'
+<% end %>
+<% if elements[:store_id].present? %>
+  AND (xpath('//ns7:UnitID/text()', convert_from(data,'utf8')::xml, '{{ns7,http://www.nrf-arts.org/IXRetail/namespace/}}'))[1]::text = '<%= elements[:store_id] %>'
+<% end %>
+  -- filter only baskets containing input 1st item
+  and (regexp_match( (xpath('//ns7:Sale/ns7:ItemID/text()', convert_from(data,'utf8')::xml, '{{ns7,http://www.nrf-arts.org/IXRetail/namespace/} }'))::text , '(' || input_items[1] || ')' ))[1]
+    = input_items[1]
+)
+
+select lsi.*, inp.input_items
+from list_sale_items lsi, inputs inp
+where array_length( input_items, 1)
+  = array_length( array( (select unnest( input_items ) intersect select unnest(lsi.sale_items) ) order by 1), 1)  -- number in intersection
 <% if elements[:limit].present? %>
- LIMIT <%= elements[:limit] %>
+  LIMIT <%= elements[:limit] %>
 <% end %>
 </textarea>
 
@@ -90,3 +123,15 @@ INNER JOIN promotions p on prb.promotion_id = p.id
 <br><br>
 </body>
 </html>
+
+
+<!--SELECT prb.promotion_id, rb.name, rb.branch_name, p.status-->
+<!--FROM  promotions_retailer_branches prb-->
+<!--INNER JOIN retailer_branches rb on prb.retailer_branch_id = rb.id-->
+<!--INNER JOIN promotions p on prb.promotion_id = p.id-->
+<!--<% if elements[:rb_name].present? %>-->
+<!-- WHERE rb.name = '<%= elements[:rb_name] %>'-->
+<!--<% end %>-->
+<!--<% if elements[:limit].present? %>-->
+<!-- LIMIT <%= elements[:limit] %>-->
+<!--<% end %>-->
