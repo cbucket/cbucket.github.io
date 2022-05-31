@@ -22,7 +22,9 @@ cachePics(pics);
 var allcards=new Array(63);
 loadUp(allcards);
 
-var numTiles = 64;   // (6X6) grid, originally 100 (10X10)
+//var numTiles = 64;   // (6X6) grid, originally 100 (10X10)
+//var numTiles = 100;   // originally 100 (10X10)
+var numTiles = 126;   // (14X9) grid
 var map=new Array(numTiles);   // numTiles/2 pairs
 loadMap(map, allcards);
 
@@ -57,7 +59,7 @@ function init() {
   runclk();
 
   for (i = 0; i < numTiles; i++) {
-    _imgAry[i].src = "image0.gif";
+    _imgAry[i].src = "img/image0.gif";
   }
   oktoclick = true;
 }
@@ -77,7 +79,7 @@ function cachePics(_pics) {
 
   for (i1 = 0; i1 < 63; i1++) {
     _pics[i1] = new Image();
-    _pics[i1].src = 'image' + i1 + '.gif';
+    _pics[i1].src = 'img/image' + i1 + '.gif';   // not this one
   }
 }
 
@@ -147,8 +149,8 @@ function showimage(_this) {
 
   if (oktoclick) {
     oktoclick = false;
-    _imgAry[but].src = 'image'+map[but]+'.gif';
-	_imgAryX[ctr].src = 'image'+map[but]+'.gif';   // put image in preview pane also
+    _imgAry[but].src = 'img/image'+map[but]+'.gif';
+	_imgAryX[ctr].src = 'img/image'+map[but]+'.gif';   // put image in preview pane also
 
     if (ctr == 0) {
       ctr++;
@@ -167,16 +169,16 @@ function showimage(_this) {
 /**************************************************************************************/
 function returntoold() {
   if ((clickarray[0] == clickarray[1]) && (!user[clickarray[0]])) { // if same tile clicked twice
-    _imgAry[clickarray[0]].src = "image0.gif";                      // then turn it back over
+    _imgAry[clickarray[0]].src = "img/image0.gif";                      // then turn it back over
 
 	oktoclick = true;
   } else {
     if (map[clickarray[0]] != map[clickarray[1]]) {            // if first and second are DIFFERENT
       if (user[clickarray[0]] == 0) {
-        _imgAry[clickarray[0]].src = "image0.gif";  // turn back over 1st
+        _imgAry[clickarray[0]].src = "img/image0.gif";  // turn back over 1st
       }
       if (user[clickarray[1]] == 0) {
-        _imgAry[clickarray[1]].src = "image0.gif";  // and 2nd
+        _imgAry[clickarray[1]].src = "img/image0.gif";  // and 2nd
       }
     }
     if (map[clickarray[0]] == map[clickarray[1]]) {            // if first/second are SAME
@@ -187,8 +189,8 @@ function returntoold() {
 
 	  if (removeTiles) {
 	    if (_noshrink) {
-          _imgAry[clickarray[1]].src = "imageblank.gif";
-          _imgAry[clickarray[0]].src = "imageblank.gif";
+          _imgAry[clickarray[1]].src = "img/imageblank.gif";
+          _imgAry[clickarray[0]].src = "img/imageblank.gif";
         } else {
           _imgAry[clickarray[0]].outerHTML = null;
           _imgAry[clickarray[1]].outerHTML = null;
@@ -203,8 +205,8 @@ function returntoold() {
       oktoclick = true;
     }
   }
-  _imgAryX[0].src = "imageblank.gif";   // blank both preview images
-  _imgAryX[1].src = "imageblank.gif";
+  _imgAryX[0].src = "img/imageblank.gif";   // blank both preview images
+  _imgAryX[1].src = "img/imageblank.gif";
 
 
 }
@@ -215,13 +217,15 @@ function ToggleAllTiles() {
 
   for (i1=0; i1<numTiles; i1++) {
     if ( user[i1]==0 ) {                                // only show/hide if undiscovered
-        _imgAry[i1].src = 'image'+ ((!GtilesVisible) ? map[i1] : 0) + '.gif';
+        _imgAry[i1].src = 'img/image'+ ((!GtilesVisible) ? map[i1] : 0) + '.gif';
 	}
   }
   GtilesVisible = !GtilesVisible;
 }
 
 /**************************************************************************************/
+// This is a function for revealing (in a hidden way) if the card being hovered over
+// is the pair of the 1st upturned card.
 function scamImage(_this) {
 //alert(_this.id);
 //alert(_this.src);
@@ -264,8 +268,10 @@ function scamImage(_this) {
 <script language="javascript">
 <!-- Begin
 //alert(Math.sqrt(numTiles));
-rowWidth = Math.sqrt(numTiles);
-colWidth = rowWidth;
+//rowWidth = Math.sqrt(numTiles);
+//colWidth = rowWidth;
+rowWidth = 9;
+colWidth = 14;
 for (r = 0; r < rowWidth; r++) {
   document.write('<tr>');
   for (c = 0; c < colWidth; c++) {
@@ -274,7 +280,7 @@ for (r = 0; r < rowWidth; r++) {
 //alert(noshrinkStr);
     document.write('<td align="center"'+ noshrinkStr + '>');
 //    document.write('<a href="javascript:showimage('+((10*r)+c)+')" onClick="document.f.b.focus()">');
-    document.write('<img src="image0.gif" height="70px" width="70px" name="img0" id="id' +((rowWidth*r)+c)+ '" border="0" onclick="showimage(this)" onmouseover="scamImage(this)">');
+    document.write('<img src="img/image0.gif" height="70px" width="70px" name="img0" id="id' +((colWidth*r)+c)+ '" border="0" onclick="showimage(this)" onmouseover="scamImage(this)">');
     document.write(/*'</a>*/'</td>');
   }
   document.write('</tr>');
@@ -286,11 +292,10 @@ for (r = 0; r < rowWidth; r++) {
 <table cellpadding="0" cellspacing="50" border="0">
 <script language="javascript">
     document.write('<tr><td align="center">');
-    document.write('<img src="imageblank.gif" height="140px" width="140px" name="imgX" border="0">');
+    document.write('<img src="img/imageblank.gif" height="140px" width="140px" name="imgX" border="0">');
     document.write('</td></tr><tr><td align="center">');
-    document.write('<img src="imageblank.gif" height="140px" width="140px" name="imgX" border="0">');
+    document.write('<img src="img/imageblank.gif" height="140px" width="140px" name="imgX" border="0">');
     document.write('</td></tr>');
-
 </script>
 </table>
 </td>
@@ -307,35 +312,5 @@ for (r = 0; r < rowWidth; r++) {
 <center>
 <font face="arial, helvetica" size="-2"><br>by <a id="scam" href="http://javascriptsource.com">The JavaScript Source</a></font>
 </center>
-
-<script>
-//redundant code
-
-/**************************************************************************************/
-// utility functions to allow debugging (linked to show all and hide all buttons
-/*
-function ShowAllTiles() {
-  for (i1=0; i1<numTiles; i1++) {
-    if ( user[i1]==0 ) {                                     // only show if undiscovered
-      _imgAry[i1].src = 'image'+map[i1]+'.gif';
-	}
-  }
-}
-*/
-
-/**************************************************************************************/
-/*
-function HideAllTiles() {
-  for (i1=0; i1<numTiles; i1++) {
-    if ( user[i1]==0 ) {                                     // only hide if undiscovered
-      _imgAry[i1].src = 'image0.gif';
-    }
-  }
-}
-*/
-
-
-</script>
-
 </body>
 </html>
