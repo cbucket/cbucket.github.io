@@ -1,0 +1,77 @@
+<!doctype html>
+<html>
+<!-- ConfluenceGen, Ben Grimer 14/09/17 -->
+<!-- this program generates code suitable to be cut/pasted into confluence wiki -->
+<!-- using comma/tab delimited output from Navicat -->
+<!-- 14/09/17 - inception -->
+
+<head>
+<!-- <script type="text/javascript" src="../util/common/util_funcs.js"></script>  -->
+<style>
+span.head { font-size:150%; }
+span.small { font-size:75%; }
+
+div.cool { font-family: courier new; border: 1px solid black; padding: 10px; background:#eef; margin: 10px 0px; }
+
+</style>
+
+<title>Conf HTML Gen</title>
+<!-- <link rel="stylesheet" type="text/css" href="include/wt_styles.css" /> -->
+<script src="wt_common.js"></script>
+<script>
+ 
+function generate_sql2()
+{
+  _orig_message = document.getElementById('orig_message').value;
+
+//  alert("gen sql 2 >" + _orig_message + "<");
+
+  var line_ary = _orig_message.split("\n");
+  var new_ary = [];
+
+  for (i=0; i<line_ary.length; i++) {
+    ary2 = line_ary[i].split("\t");
+
+    if ("character varying"==ary2[1] || "varchar"==ary2[1]) {
+      _type = "varchar(" + ary2[2] + ")";
+    } else if ("character"==ary2[1] || "char"==ary2[1]) {
+      _type = "char(" + ary2[2] + ")";
+    } else if ("timestamp with time zone"==ary2[1] ) {
+      _type = "timestamptz";
+    } else _type = ary2[1];
+
+    new_ary.push( "<b><u>" + ary2[0] + "</u></b>&nbsp(" + _type + ")<br/><br/>desc...<br/><br/>" );
+  }
+
+  html_out.innerHTML = "<br/>" + new_ary.join("");
+}
+
+</script>
+</head>
+<body>
+<p>
+This page generates Confluence code from column definitions.
+</p>
+
+<br>
+db code to convert<br>
+<textarea rows="12" cols="160" class="cool" id="orig_message">id	bigint	
+mail_service_identifier	character varying	255
+recipient_email_address	character varying	255
+delivery_status	character	16
+event_timestamp	timestamp with time zone	
+created_at	timestamp with time zone	
+delivery_status_code	integer	
+delivery_status_mx	character varying	64
+delivery_status_message	character varying	1024
+delivery_retry_seconds	integer	</textarea>
+
+<br/><input TYPE="button" value="generate2" onclick="generate_sql2();" /><br><br>
+ 
+<div class="heading">Confluence HTML</div>
+<div class="sqltext" id="html_out">Confluence HTML will appear here ...</div>
+
+ <br><br>
+ 
+</body>
+</html>

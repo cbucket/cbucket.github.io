@@ -11,6 +11,10 @@ at various times.
 This page generates prettyfied column output similar to the output 
 produced by the psql terminal application.
 
+### ConflueceGen.html
+This program generates code suitable to be cut/pasted into confluence wiki
+using comma/tab delimited output from Navicat.
+
 ### comma_in_clause.html
 This page will convert a list of inputs to a SQL fragment 
 suitable for use with an SQL in clause. It assumes that the 

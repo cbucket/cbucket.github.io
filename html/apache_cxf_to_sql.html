@@ -1,0 +1,208 @@
+<!doctype html>
+<html>
+<!-- apache_cxf_to_sql, Ben Grimer 13/06/18 -->
+<!-- This program converts an XML request fragment taken from the apache-cxf.log file -->
+<!-- and generates SQL which can be used to locate the relevant data on the OPS database -->
+<!-- 14/06/18 - v0.1 - tested with DCG production only -->
+<!-- 14/06/18 - v0.2 - searches for 2 tables: mcore5_transactions_view, mcore5_app_requests -->
+<!-- 21/06/18 - v0.3 - DCG2 functionality -->
+
+<!-- Current Status : split the processing into a function for each retailer (before was in the main handler)   -->
+<!--                  Got the basic functionality working for DCG2 but only finds the request, not the transaction get  -->
+<!--                  got the basic Reqexbit working for certain XML elements for DCG2 -->
+
+<head>
+<!-- <script type="text/javascript" src="../util/common/util_funcs.js"></script>  -->
+<style>
+span.head { font-size:150%; }
+span.small { font-size:75%; }
+div.cool { font-family: courier new; border: 1px solid black; padding: 10px; background:#eef; margin: 10px 0px; }
+</style>
+
+<title>Apache cxf to SQL</title>
+<!-- <link rel="stylesheet" type="text/css" href="include/wt_styles.css" /> -->
+<script src="wt_common.js"></script>
+<script>
+
+/* XML e.g. fragments */
+
+var G_dcg
+  = '<?xml version="1.0" encoding="UTF-8"?><soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" '
+  + 'xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><soapenv:Body><GetSaleRewardV2 xmlns="http://the-logic-group.com/PosWebService/PosWs"><loginToken>e4c16b5b-d44f-49f9-ae54-b3ff969fe0c6</loginToken>'
+  + '<siteNumber>2916</siteNumber><terminalNumber>3</terminalNumber><transactionNumber>95490</transactionNumber><transactionDate>13/06/2018</transactionDate><transactionTime>16:40:40</transactionTime>'
+  + '<operatorNumber>9501068</operatorNumber><cardNumber>100</cardNumber><totalSpend>149.99</totalSpend><basketList>0000149415~149.99~1</basketList></GetSaleRewardV2></soapenv:Body></soapenv:Envelope>';
+
+var G_dcg2
+  = '<soapenv:Envelope xmlns:soapenv="http://www.w3.org/2003/05/soap-envelope"><soapenv:Body><ns5:PostData xmlns:ns5="http://www.ecrebo.com/api/v3/core" xm"'
+  + 'lns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="ns5:PostData" MajorVersion="3" MinorVersion="0"><ns5:RequestID>f1b267ad-7d2f-48a2-bf61-d45b2b8ad5'
+  + '8d</ns5:RequestID><ns5:Requester><ns5:Provider>Eclipse</ns5:Provider></ns5:Requester><TransactionData xmlns="http://www.ecrebo.com/api/transaction/v1" MajorVer'
+  + 'sion="1" MinorVersion="0" Type="GTF"><POSLog xmlns:e="http://www.ecrebo.com/transaction/v1.0" xmlns="http://www.nrf-arts.org/IXRetail/namespace/" MinorVersion='
+  + '"0" MajorVersion="6" FixVersion="0"><Transaction><BusinessUnit><UnitID TypeCode="RetailStore" Name="Ecrebo">0887</UnitID><Address><AddressLine>27 THE BROADWAY<'
+  + '/AddressLine><City>WIMBLEDON</City><PostalCode>SW19 1PS</PostalCode><Country>GB</Country></Address></BusinessUnit><WorkstationID TypeCode="POS">004</Workstatio'
+  + 'nID><SequenceNumber>045238</SequenceNumber><ReceiptNumber>0887004201806190052388</ReceiptNumber><POSLogDateTime TypeCode="Transaction">2018-06-19T06:07:02.083+'
+  + '01:00</POSLogDateTime><OperatorID OperatorName="Hussein">8588791</OperatorID><CurrencyCode>GBP</CurrencyCode><RetailTransaction TypeCode="Transaction" Transact'
+  + 'ionStatus="Tendered"><ItemCount>1</ItemCount><LineItem><Sale><ItemID>0000130776</ItemID><Description>SONY PS PLUS 3 MONTHS</Description><ExtendedAmount>19.99</'
+  + 'ExtendedAmount></Sale><SequenceNumber>1</SequenceNumber></LineItem><Total TypeCode="Sale" TotalType="TransactionGrandAmount">19.99</Total><Customer BusinessCus'
+  + 'tomerFlag="false"/></RetailTransaction></Transaction></POSLog></TransactionData><ns5:GetDataReportList xmlns:ns5="http://www.ecrebo.com/api/v3/core"></ns5:GetD'
+  + 'ataReportList></ns5:PostData></soapenv:Body></soapenv:Envelope>';
+
+var G_orig_message;
+
+function init() {
+  console.log('init called ...');
+  G_orig_message = document.getElementById('orig_message');
+  G_orig_message.value = G_dcg;
+}
+
+function select_retailer(obj) {
+
+  console.log('select changed()' + obj.value);
+//  console.log('orig=' + G_orig_message.value);
+
+  if ('dcg2' == obj.value) {
+    G_orig_message.value = G_dcg2;
+  } else {
+    G_orig_message.value = G_dcg;
+  }
+}
+
+function process_DCG() {
+  console.log("process DCG");
+
+  re1 = new RegExp(/<transactionDate>(.*?)<\/transactionDate>/);           /* e.g. regex =  /,(\d+),sysdate/ */
+  re2 = new RegExp(/<transactionTime>(.*?)<\/transactionTime>/);
+  re3 = new RegExp(/<siteNumber>(.*?)<\/siteNumber>/);
+  re4 = new RegExp(/<transactionNumber>(.*?)<\/transactionNumber>/);
+  re5 = new RegExp(/(.*?)\/(.*?)\/(.*)/);                                  /* used to reverse dd, mm and yyyy elements of date */
+  re6 = new RegExp(/<totalSpend>(.*?)<\/totalSpend>/);
+
+  var ary_temp = re1.exec(_orig_message);
+  var tranDate = ary_temp[1];
+      ary_temp = re2.exec(_orig_message);
+  var tranTime = ary_temp[1];
+      ary_temp = re3.exec(_orig_message);
+  var siteNumb = ary_temp[1];
+      ary_temp = re4.exec(_orig_message);
+  var tranNumb = ary_temp[1];
+      ary_temp = re6.exec(_orig_message);
+  var totSpend = ary_temp[1];
+
+      ary_temp = re5.exec(tranDate);
+  var dd   = ary_temp[1];
+  var mm   = ary_temp[2];
+  var yyyy = ary_temp[3];
+
+  tranDate         = yyyy + "-" + mm + "-" + dd;
+  var tranDateTime = tranDate + " " + tranTime;     /* format="yyyy-mm-dd hh:mm:ss" */
+
+  var new_ary = [];
+  new_ary.push( "<b><u>mcore5_transactions_view</u></b>&nbsp;&nbsp;<i>(Will not neccessarily return info. for voucher redeem transactions)</i><br/>");
+
+  new_ary.push( "select substring(poslog::text from '&ltBusinessUnit\>\&ltUnitID\>(.*?)&lt/UnitID>&lt/BusinessUnit>') as \"SiteNumber\"<br/>");
+  new_ary.push( "&nbsp;&nbsp;,substring(poslog::text from '&ltSequenceNumber>(.*?)&lt/SequenceNumber>') as \"TranNumber\"<br/>");
+  new_ary.push( "&nbsp;&nbsp;,substring(poslog::text from '&ltTotal.*?>(.*?)&lt/Total>') as \"TotalSpend\"<br/>");
+  new_ary.push( "&nbsp;&nbsp;,*<br/>");
+  new_ary.push( "from mcore5_transactions_view<br/>");
+  new_ary.push( "where receipt_timestamp = '" + tranDateTime + "'<br/>");
+  new_ary.push( "and created_at between '" + tranDateTime + "'::timestamp  - interval '1.5 hours' and '" + tranDateTime + "'::timestamp + interval '1.5 hours'<br/>" );
+  new_ary.push( "and substring(poslog::text from '&ltBusinessUnit\>\&ltUnitID\>(.*?)&lt/UnitID>&lt/BusinessUnit>') = '" + siteNumb + "'<br/>" );
+  new_ary.push( "and substring(poslog::text from '&ltSequenceNumber>(.*?)&lt/SequenceNumber>') = '" + tranNumb + "'<br/>" );
+  new_ary.push( "and substring(poslog::text from '&ltTotal.*?>(.*?)&lt/Total>') = '" + totSpend + "'<br/>" );
+  new_ary.push( "limit 5;<br/><br/>");
+
+  new_ary.push( "<b><u>mcore5_app_requests</u></b><br/>");          // SQL to search mcore5_app_requests
+
+  new_ary.push( "select substring( convert_from(data, 'utf-8') from '&ltns3:timestamp>(.*?):000&lt/ns3:timestamp>') as \"ReceiptTime\"<br/>");
+  new_ary.push( "&nbsp;&nbsp;,substring( convert_from(data, 'utf-8') from '&ltBusinessUnit>&ltUnitID>(.*?)&lt/UnitID>&lt/BusinessUnit>') as \"SiteNumber\"<br/>");
+  new_ary.push( "&nbsp;&nbsp;,substring( convert_from(data, 'utf-8') from '&ltSequenceNumber>(.*?)&lt/SequenceNumber>') as \"TranNumber\"<br/>");
+  new_ary.push( "&nbsp;&nbsp;,substring( convert_from(data, 'utf-8') from '&ltTotal.*?>(.*?)&lt/Total>') as \"TotalSpend\"<br/>");
+  new_ary.push( "&nbsp;&nbsp;,convert_from(data, 'utf-8'),*<br/>");
+  new_ary.push( "from mcore5_app_requests<br/>");
+  new_ary.push( "where created_at between '" + tranDateTime + "'::timestamp  - interval '1.5 hours' and '" + tranDateTime + "'::timestamp + interval '1.5 hours'<br/>" );
+  new_ary.push( "and substring( convert_from(data, 'utf-8') from '&ltBusinessUnit>&ltUnitID>(.*?)&lt/UnitID>&lt/BusinessUnit>') = '" + siteNumb + "'<br/>" );
+  new_ary.push( "and substring( convert_from(data, 'utf-8') from '&ltSequenceNumber>(.*?)&lt/SequenceNumber>') = '" + tranNumb + "'<br/>" );
+  new_ary.push( "and substring( convert_from(data, 'utf-8') from '&ltTotal.*?>(.*?)&lt/Total>') = '" + totSpend + "'<br/>" );
+  new_ary.push( "and substring( convert_from(data, 'utf-8') from '&ltns3:timestamp>(.*?):000&lt/ns3:timestamp>') = '" + tranDateTime + "'<br/>");
+  new_ary.push( "limit 5;<br/><br/>");
+
+  html_out.innerHTML = new_ary.join("");    // "<br/>" + new_ary.join("");
+}
+
+function process_DCG2() {
+  console.log("process DCG2");
+
+  re1 = new RegExp(/<ns5:RequestID>(.*?)<\/ns5:RequestID>/);
+
+  var ary_temp = re1.exec(_orig_message);
+  var reqUUID  = ary_temp[1];
+
+  console.log("request uuid=>" + reqUUID + "<.");
+
+  var new_ary = [];
+  new_ary.push( "<b><u>mcore5_app_requests</u></b><br/>");          // SQL to search mcore5_app_requests
+
+  new_ary.push( "select substring( convert_from(data, 'utf-8') from '&ltns7:POSLogDateTime.*>(.*?)&lt/ns7:POSLogDateTime>') as \"POSLOG_DateTime\"<br/>");
+  new_ary.push( "&nbsp;&nbsp;,substring( convert_from(data, 'utf-8') from '&ltns7:BusinessUnit>&ltns7:UnitID.*>(.*?)&lt/ns7:UnitID>') as \"SiteNumber\"<br/>");
+  new_ary.push( "&nbsp;&nbsp;,substring( convert_from(data, 'utf-8') from '&ltns7:SequenceNumber>(.*?)&lt/ns7:SequenceNumber>') as \"SeqNumber\"<br/>");
+  new_ary.push( "&nbsp;&nbsp;,substring( convert_from(data, 'utf-8') from '&ltns7:Total.*?>(.*?)&lt/ns7:Total>') as \"TotalSpend\"<br/>");
+  new_ary.push( "&nbsp;&nbsp;,convert_from(data, 'utf-8'),*<br/>");
+  new_ary.push( "from mcore5_app_requests<br/>");
+  new_ary.push( "where request_uuid = '" + reqUUID + "';<br/>" );
+  new_ary.push( "<br/>");
+
+  html_out.innerHTML = new_ary.join("");    // "<br/>" + new_ary.join("");
+
+}
+
+function generate_sql2() {
+
+  _orig_message = G_orig_message.value;
+
+  var e = document.getElementById("ddlRetailers");
+  var strRetailer = e.options[e.selectedIndex].value;
+console.log("Retailer = " + strRetailer);
+
+  if ("dcg" == strRetailer) {
+    process_DCG();
+  } else {
+    process_DCG2();
+  }
+
+/*
+  try {
+  } catch {
+    alert("There is something wrong with the XML above, possibly it is not DCG.");
+  }
+*/
+}
+
+</script>
+</head>
+<body onload="init()">
+<p>
+This page generates SQL to identify a transaction from an xml fragment taken from the DCG apache.cxf file. (v0.3 - 21/06/18)<br/>
+<small>(Ben Grimer June 2018)</small>
+</p>
+
+<br>
+Paste apache_cxf.log* soap request in place of example below:<br>
+<textarea rows="12" cols="160" class="cool" id="orig_message"></textarea>
+
+<br/><input TYPE="button" value="generate2" onclick="generate_sql2();" />
+Retailer:
+<select onchange="select_retailer(this);" id="ddlRetailers">
+  <option value="dcg">DCG</option>
+  <option value="screwfix" disabled>Screwfix</option>
+  <option value="dcg2">DCG2</option>
+</select>
+<br/><br/>
+
+<div class="heading"><u>SQL shown below</u></div>
+<br/>
+<div class="tooltip" id="html_out">SQL will appear here ...
+</div>
+
+ <br><br>
+ 
+</body>
+</html>
