@@ -11,7 +11,23 @@
 
 /* global variables */
 
-  var roomAry=[[2,4,3,5,0,0,0,0],[0,1,3,0,0,0,0,0]]
+  var roomAry=[[2,4,3,5,0,0,0,0],[0,1,3,0,0,0,0,0]];
+
+  var roomDescriptions=[["This is a dummy room, nobody ever goes here!"]
+                       ,[ "You are in the front hall."                               // room 1
+                         ,"There is a staircase going up"
+                         ,"There are exits to the North, East and West"]
+                       ,[ "You are in the left kitchen."                             // room 2
+                         ,"There is an exit N to the garden"]
+                       ,[ "You are in the right kitchen."                            // room 3
+                         ,"A door leads East to the Utility Room"]
+                       ,[ "You are outside in the front garden."                     // room 4
+                         ,"There is a line of lavender plants leading up to a front door"]
+                       ,[ "You are in the living room."                              // room 5
+                         ,"A Sacred Heart picture is hanging above the mantelpiece"]
+                       ,[ "You are in the dining room."                              // room 6
+                         ,"There are 2 exits to the west"]
+                       ]
 
 gContext = 1;
   // the variables below are NOT prefix with 'var' because they are Global variables
@@ -26,6 +42,8 @@ gContext = 1;
   var response$;      // (strC$) Y/N answer from the prompt.  (strT$=tildaresponse$ is redundant)
   var newAnimal$;     // (strV$) animal person was thinking of
   var newQues$;       // (strX$) question to distinguish new animal from existing animal
+
+  var gRoomNumber     // current room
 
 // replaced lines 310-320 in original program.  (Y becomes N, N becomes Y)
 function opposite(_YN) {
@@ -140,9 +158,9 @@ function context_intro(id) {
 
   switch (id) {
     case 1:
-      gLoadButton.disabled = false;    // enable the load/save option
-      gSaveButton.disabled = false;
-      promptX("ARE YOU THINKING OF AN ANIMAL ?", "Y/N/LIST/DEBUG");
+<!--      gLoadButton.disabled = false;    // enable the load/save option-->
+<!--      gSaveButton.disabled = false;-->
+      promptX("What do you want to do ?", "Y/N/LIST/DEBUG");
       break;
     case 2:
       promptX(AryA$[nextQuID].split("~Q")[1].split("~")[0] + " ?","Y/N");  // 410-430
@@ -206,6 +224,23 @@ function context_6_process() {
   }
 }
 
+// *******************************************
+function print_all_rooms() {
+
+  for (i0=0; i0 < roomDescriptions.length; i0++) {
+    room_description(i0)
+    basPrint(i0 + " ---------------------------");
+  }
+}
+
+// *******************************************
+function room_description(_roomNumber) {
+
+  for (i1=0; i1 < roomDescriptions[_roomNumber].length; i1++) {
+    basPrint(roomDescriptions[_roomNumber][i1]);
+  }
+}
+
 /* initialise function - called onload of body */
 function init() {
 
@@ -214,10 +249,29 @@ function init() {
   basPrint();
   basPrint("PLAY 'CIRCUIT LANE ADVENTURE'");
   basPrint();
-  basPrint("HIT ANY KEY TO START");
+  basPrint("You are in a quiet lane. In front on you is a house.");
+  basPrint();
+  basPrint("What do you want to do?");
   basPrint();
 
-<!--  gLoadButton = document.getElementById("load");-->
+  gRoomNumber = 1;
+
+  print_all_rooms()
+  room_description(0);
+//  basPrint();
+//  room_description(1);
+
+//  room_description(gRoomNumber);
+
+//  basPrint("length =" + roomDescriptions.length )
+//  basPrint("room 0 1 >" + roomDescriptions[0][1] + "<")
+//  basPrint("sub-length =" + roomDescriptions[1].length )
+  basPrint();
+  basPrint();
+  basPrint("up to here");
+
+
+<!--  gLoadButton   = document.getElementById("load");-->
 <!--  gSaveButton = document.getElementById("save");-->
 
   context_intro(1);     // are you thinking of an animal, etc...
