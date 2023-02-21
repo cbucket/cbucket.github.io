@@ -11,6 +11,9 @@
 
 /* global variables */
 
+  var directions="NSEWUD";
+  var dirDescript=("North","South","East","West","Up","Down");
+
 // N, S, E, W, U, D, Object (-ve = monster, 0 = empty, >9 = treasure
   var roomAry=[[0,0,0,0,0,0,0,0]    // ROOM 0 (dummy)
               ,[5,6,2,4,0,0,0,0]   // ROOM 1 (Front Hall)
@@ -108,7 +111,16 @@ function printAnimalAry() {
 // function assumes response variable is uppercase (done automatically in keypress textbox event)
 function processResponse() {
 
-//  basPrint("Response is >" + response$ + "<");
+  alert("Response is >" + response$ + "<");
+  alert("response.length="+response$.length );
+  if (1 == response$.length) {
+    index = directions.search(response$);
+    alert("direction index="+index);
+  } else {
+    basPrint("Invalid direction!");
+  }
+//  basPrint("direction="+
+
   switch (response$) {
     case 'N':
       index = 0;
