@@ -2,7 +2,7 @@
 <!-- This adventure is based on the layout of 9 Circuit Lane -->
 <!-- 09/06/22 - started -->
 
-
+<!--template: animal.html-->
 <head>
 
 <link rel="stylesheet" type="text/css" href="common/creative.css" />
@@ -12,7 +12,7 @@
 /* global variables */
 
   var directions="NSEWUD";
-  var dirDescript=("North","South","East","West","Up","Down");
+  var dirDescript=["North","South","East","West","Up","Down"];
 
 // N, S, E, W, U, D, Object (-ve = monster, 0 = empty, >9 = treasure
   var roomAry=[[0,0,0,0,0,0,0,0]    // ROOM 0 (dummy)
@@ -45,10 +45,8 @@
                        ]
 
 gContext = 1;
-  // the variables below are NOT prefix with 'var' because they are Global variables
+// the variables below are NOT prefix with 'var' because they are Global variables
 
-
-// var AryA$=[ "4","~QDOES IT SWIM~Y2~N3~","~AFISH","~ABIRD" ]; // lines 70 and 530
    var AryA$=["16","~QDOES IT SWIM~Y2~N3~","~QIS IT A MAMMAL~Y9~N8~","~QDOES IT HAVE WINGS~N5~Y4~","~ABIRD","~QDOES IT CHASE MICE~Y7~N6~","~QDOES IT HAVE A TRUNK~Y11~N10~","~ACAT","~AFISH","~AWHALE","~QDOES IT HAVE STRIPES~Y15~N14~","~QIS IT EXTINCT~Y13~N12~","~AELEPHANT","~AWOOLLY MAMMOTH","~ALION","~ATIGER"];
 
   var answer$;        // (strA$) response from prompt (strB$) complement of response (now uses opposite fn)
@@ -61,13 +59,13 @@ gContext = 1;
   var gRoomNumber     // current room
 
 // replaced lines 310-320 in original program.  (Y becomes N, N becomes Y)
-function opposite(_YN) {
+<!--function opposite(_YN) {-->
 
-  if (_YN.match(/^[YN]$/) == null) {
-    alert("input (" + _YN + ") must be Y or N\nFunction will return NULL\n*** THIS SHOULD NEVER HAPPEN ! ***");
-    return(null);
-  } else return("YN"[+("Y"==_YN)]);
-}
+<!--  if (_YN.match(/^[YN]$/) == null) {-->
+<!--    alert("input (" + _YN + ") must be Y or N\nFunction will return NULL\n*** THIS SHOULD NEVER HAPPEN ! ***");-->
+<!--    return(null);-->
+<!--  } else return("YN"[+("Y"==_YN)]);-->
+<!--}-->
 
 // designed to be changed to use a text box instead of a prompt.
 function promptX(question, options)
@@ -111,36 +109,22 @@ function printAnimalAry() {
 // function assumes response variable is uppercase (done automatically in keypress textbox event)
 function processResponse() {
 
-  alert("Response is >" + response$ + "<");
-  alert("response.length="+response$.length );
+  valid = true
+  invalid = false
+//  alert("Response is >" + response$ + "<");
+//  alert("response.length="+response$.length );
   if (1 == response$.length) {
     index = directions.search(response$);
-    alert("direction index="+index);
-  } else {
-    basPrint("Invalid direction!");
+//    alert("direction index="+index);
+    if (-1 == index) { invalid = true }
   }
-//  basPrint("direction="+
 
-  switch (response$) {
-    case 'N':
-      index = 0;
-      basPrint("go north");
-      break;
-    case 'S':
-      index = 1;
-      basPrint("go south");
-      break;
-    case 'E':
-      index = 2;
-      basPrint("go east");
-      break;
-    case 'W':
-      index = 3;
-      basPrint("go west");
-      break;
-    default:
-      basPrint("Invalid input");
+  if (invalid) {
+    basPrint("Invalid direction! :" + response$);
+  } else {
+    basPrint("go " + dirDescript[index] );
   }
+
   if (roomAry[gRoomNumber][index] > 0) { //uptohere
     gRoomNumber = roomAry[gRoomNumber][index];
   } else {
@@ -153,65 +137,65 @@ function processResponse() {
 }
 
 // function assumes response variable is uppercase (done automatically in keypress textbox event)
-function processResponseOld() {
+<!--function processResponseOld() {-->
 
-  switch (gContext) {
-    case 1:
-      context_1_process();
-      break;
-    case 2:
-      context_2_process();
-      break;
-    case 3:
-      context_3_process();
-      break;
-    case 4:
-      context_4_process();
-      break;
-    case 5:
-      context_5_process();
-      break;
-    case 6:
-      context_6_process();
-      break;
-    default:
-      break;
-  }
-  context_intro(gContext);
-}
+<!--  switch (gContext) {-->
+<!--    case 1:-->
+<!--      context_1_process();-->
+<!--      break;-->
+<!--    case 2:-->
+<!--      context_2_process();-->
+<!--      break;-->
+<!--    case 3:-->
+<!--      context_3_process();-->
+<!--      break;-->
+<!--    case 4:-->
+<!--      context_4_process();-->
+<!--      break;-->
+<!--    case 5:-->
+<!--      context_5_process();-->
+<!--      break;-->
+<!--    case 6:-->
+<!--      context_6_process();-->
+<!--      break;-->
+<!--    default:-->
+<!--      break;-->
+<!--  }-->
+<!--  context_intro(gContext);-->
+<!--}-->
 
-function context_1_process() {
+<!--function context_1_process() {-->
 
-  if (response$ == "LIST") {
-    list_animals();                         // 140 (then 600)
-    gContext = 1;
-  } else if (response$ == "DEBUG") {
-    printAnimalAry();
-    gContext = 1;
-  } else if (response$ == "Y") {
-    gLoadButton.disabled = true;    // disable the load/save option
-    gSaveButton.disabled = true;
-    gContext = 2;
-    nextQuID = 1;
-  } else if (response$ == "N") {
-    basPrint("The End (is come).");
-  }
-}
+<!--  if (response$ == "LIST") {-->
+<!--    list_animals();                         // 140 (then 600)-->
+<!--    gContext = 1;-->
+<!--  } else if (response$ == "DEBUG") {-->
+<!--    printAnimalAry();-->
+<!--    gContext = 1;-->
+<!--  } else if (response$ == "Y") {-->
+<!--    gLoadButton.disabled = true;    // disable the load/save option-->
+<!--    gSaveButton.disabled = true;-->
+<!--    gContext = 2;-->
+<!--    nextQuID = 1;-->
+<!--  } else if (response$ == "N") {-->
+<!--    basPrint("The End (is come).");-->
+<!--  }-->
+<!--}-->
 
 // this is for processing Y/N answers to QUESTIONs.  If the result
 // yields an animal the goto context 3
-function context_2_process() {
+<!--function context_2_process() {-->
 
-  if (response$ != "Y" && response$ != "N") {
-    alert("ERROR: in fn context_2_process()");
-  }
-  var re1 = new RegExp("^.*?~" + response$ + "(\\d+)~.*?$");  // + added '+' after \d to fix bug - was only handling single digits
-  nextQuID = parseInt(AryA$[nextQuID].replace(re1,"$1"));     // count use re.exec() here too.  See worksmart/converter.html
+<!--  if (response$ != "Y" && response$ != "N") {-->
+<!--    alert("ERROR: in fn context_2_process()");-->
+<!--  }-->
+<!--  var re1 = new RegExp("^.*?~" + response$ + "(\\d+)~.*?$");  // + added '+' after \d to fix bug - was only handling single digits-->
+<!--  nextQuID = parseInt(AryA$[nextQuID].replace(re1,"$1"));     // count use re.exec() here too.  See worksmart/converter.html-->
 
-  if (AryA$[nextQuID].substr(0,2) != "~Q") {   // if the next question string identifies an animal then NEW context
-      gContext = 3;
-  }
-}
+<!--  if (AryA$[nextQuID].substr(0,2) != "~Q") {   // if the next question string identifies an animal then NEW context-->
+<!--      gContext = 3;-->
+<!--  }-->
+<!--}-->
 
 // ###############################################
 // template: see animal.html
@@ -242,47 +226,47 @@ function context_intro(id) {
   }
 }
 
-function context_3_process() {
+<!--function context_3_process() {-->
 
-    if (response$ == "Y") {
-      basPrint("WHY NOT TRY ANOTHER ANIMAL ?");
-      gContext = 1;
-    } else {
-      gContext = 4;
-    }
-}
+<!--    if (response$ == "Y") {-->
+<!--      basPrint("WHY NOT TRY ANOTHER ANIMAL ?");-->
+<!--      gContext = 1;-->
+<!--    } else {-->
+<!--      gContext = 4;-->
+<!--    }-->
+<!--}-->
 
-function context_4_process() {
+<!--function context_4_process() {-->
 
-  newAnimal$ = response$;
-  gContext = 5;
-}
+<!--  newAnimal$ = response$;-->
+<!--  gContext = 5;-->
+<!--}-->
 
-function context_5_process() {
+<!--function context_5_process() {-->
 
-  newQues$ = response$;
-  gContext = 6;
-}
+<!--  newQues$ = response$;-->
+<!--  gContext = 6;-->
+<!--}-->
 
 // adds a new animal to the array
-function context_6_process() {
+<!--function context_6_process() {-->
 
-  answer$ = response$;
+<!--  answer$ = response$;-->
 
-  if (answer$ == "Y" || answer$ == "N") {
-    intZ1 = parseInt(AryA$[0]);  // 330                  get the INTEGER in the first cell
-    AryA$[0] = (intZ1+2).toString();  // 340             store value+2 in first cell (effectively add 2 cells the array)
+<!--  if (answer$ == "Y" || answer$ == "N") {-->
+<!--    intZ1 = parseInt(AryA$[0]);  // 330                  get the INTEGER in the first cell-->
+<!--    AryA$[0] = (intZ1+2).toString();  // 340             store value+2 in first cell (effectively add 2 cells the array)-->
 
-    AryA$[intZ1] = AryA$[nextQuID];                   // store the current question in the last cell
-    AryA$[intZ1+1] = "~A" + newAnimal$;               // store the new animal in the last cell + 1
-    AryA$[nextQuID] = "~Q" +newQues$ +"~" +answer$ +(intZ1+1).toString() +"~" +opposite(answer$) +intZ1.toString() +"~"; // 370
-                                                      // store the new question with the Y/N answer references in the current cell
-    promptX("question added", newQues$);  // 280-290 
-    gContext = 1;
-  } else {
-    alert("context_6_process: must answer Y or N !!");
-  }
-}
+<!--    AryA$[intZ1] = AryA$[nextQuID];                   // store the current question in the last cell-->
+<!--    AryA$[intZ1+1] = "~A" + newAnimal$;               // store the new animal in the last cell + 1-->
+<!--    AryA$[nextQuID] = "~Q" +newQues$ +"~" +answer$ +(intZ1+1).toString() +"~" +opposite(answer$) +intZ1.toString() +"~"; // 370-->
+<!--                                                      // store the new question with the Y/N answer references in the current cell-->
+<!--    promptX("question added", newQues$);  // 280-290 -->
+<!--    gContext = 1;-->
+<!--  } else {-->
+<!--    alert("context_6_process: must answer Y or N !!");-->
+<!--  }-->
+<!--}-->
 
 // *******************************************
 function print_all_rooms() {
@@ -343,9 +327,6 @@ function showRooms()
 
 /* ---------------------------------------------------------*/
 
-/* original program listing *
- * this can now be found in file animal_listing.bas (in same folder) ***
- */
 </script>
 </head>
 
@@ -357,8 +338,10 @@ function showRooms()
 
 <!-- question: <span id="quest1"></span> -->
 <input TYPE="button" title="answer (Y)es" value="Yes" onclick="TickYesOrNo('Y');" />&nbsp;
-<input TYPE="button" title="answer (N)es" value="No" onclick="TickYesOrNo('N');" />&nbsp;
+<input TYPE="button" title="answer (N)o" value="No" onclick="TickYesOrNo('N');" />&nbsp;
 <input TYPE="button" id="showrooms" title="show room array" value="ShowRoom" onclick="showRooms();" />&nbsp;
+
+<input TYPE="button" title="answer (N)orth" value="N" onclick="TickYesOrNo('N');" />&nbsp;
 
 <br>command: <input id="inputtbox" type="text" size="100" onkeypress="checkEnter(this);"></input>
 <br><span id="saveconf">X</span>
