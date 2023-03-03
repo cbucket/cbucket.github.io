@@ -17,23 +17,24 @@
 // N, S, E, W, U, D, Object (-ve = monster, 0 = empty, >9 = treasure
   var roomAry=[[0,0,0,0,0,0,0,0]    // ROOM 0 (dummy)
               ,[5,6,2,4,0,0,0,0]   // ROOM 1 (Front Hall)
-              ,[0,3,0,1,0,0,0,0]   // ROOM 2 (Left Kitchen)
-              ,[2,0,0,6,0,0,0,0]   // ROOM 3 (Right Kitchen)
+              ,[0,3,9,1,0,0,0,0]   // ROOM 2 (Left Kitchen)
+              ,[2,8,0,6,0,0,0,0]   // ROOM 3 (Right Kitchen)
               ,[0,0,1,7,0,0,0,0]   // ROOM 4 (Front Garden)
               ,[0,1,0,0,0,0,0,0]   // ROOM 5 (Living Room)
               ,[1,1,3,0,0,0,0,0]   // ROOM 6 (Dining/School Room)
               ,[0,0,4,0,0,0,0,0]   // ROOM 7 (Quiet Lane)
-              ,[0,0,0,0,0,0,0,0]   // ROOM 8
+              ,[3,0,0,0,0,0,0,0]   // ROOM 8 (Utility Room)
+              ,[0,0,0,2,0,0,0,0]   // ROOM 8 (Conservatory)
               ];
 
   var roomDescriptions=[["This is a dummy room, nobody ever goes here!"]
                        ,[ "You are in the front hall.\n"                               // room 1
                          ,"There is a staircase going up"
-                         ,"There are exits to the North, East and West"]
+                         ,"There are exits to the North, South, East and West"]
                        ,[ "You are in the left kitchen.\n"                             // room 2
-                         ,"There is an exit N to the garden"]
+                         ,"There is an exit east to the conservatory"]
                        ,[ "You are in the right kitchen.\n"                            // room 3
-                         ,"A door leads East to the Utility Room"]
+                         ,"A door leads South to the Utility Room"]
                        ,[ "You are outside in the front garden.\n"                     // room 4
                          ,"There is a line of lavender plants leading up to a front door"]
                        ,[ "You are in the living room.\n"                              // room 5
@@ -42,6 +43,10 @@
                          ,"There are 2 exits to the west"]
                        ,[ "You are in a quiet lane.\n"                                 // room 7
                          ,"to the east is a driveway"]
+                       ,[ "You are in the Utility Room.\n"                             // room 8
+                         ,"to the north is a kitchen"]
+                       ,[ "You are in the conservatory.\n"                             // room 9
+                         ]
                        ]
 
 gContext = 1;
@@ -339,9 +344,18 @@ function showRooms()
 <!-- question: <span id="quest1"></span> -->
 <input TYPE="button" title="answer (Y)es" value="Yes" onclick="TickYesOrNo('Y');" />&nbsp;
 <input TYPE="button" title="answer (N)o" value="No" onclick="TickYesOrNo('N');" />&nbsp;
-<input TYPE="button" id="showrooms" title="show room array" value="ShowRoom" onclick="showRooms();" />&nbsp;
+<input TYPE="button" id="showrooms" title="show room array" value="ShowRoom" onclick="showRooms();" />&nbsp;<br>
 
-<input TYPE="button" title="answer (N)orth" value="N" onclick="TickYesOrNo('N');" />&nbsp;
+<!--<input TYPE="button" title="answer (N)orth" value="N" onclick="TickNSEWUD('N');" />&nbsp-->
+<!--<input TYPE="button" title="answer (S)outh" value="S" onclick="TickNSEWUD('S');" />&nbsp-->
+<!--<input TYPE="button" title="answer (E)ast"  value="E" onclick="TickNSEWUD('E');" />&nbsp-->
+<!--<input TYPE="button" title="answer (W)est"  value="W" onclick="TickNSEWUD('W');" />&nbsp-->
+
+<table>
+<tr><td></td><td><input TYPE="button" title="answer (N)orth" value="N" onclick="TickNSEWUD('N');" /></td><td></td></tr>
+<tr><td><input TYPE="button" title="answer (W)est"  value="W" onclick="TickNSEWUD('W');" /></td><td></td><td><input TYPE="button" title="answer (E)ast"  value="E" onclick="TickNSEWUD('E');" /></td></tr>
+<tr><td></td><td><input TYPE="button" title="answer (S)outh" value="S" onclick="TickNSEWUD('S');" /></td><td></td></tr>
+</table>
 
 <br>command: <input id="inputtbox" type="text" size="100" onkeypress="checkEnter(this);"></input>
 <br><span id="saveconf">X</span>

@@ -20,6 +20,19 @@ function TickYesOrNo(pYN) {
   return false;
 }
 
+function TickNSEWUD(pYN) {
+
+//  index = directions.search(pYN);
+//  alert("direction index="+index);
+  if (-1 == directions.search(pYN)) { alert("TickNSEWUD(): this should never happen !"); }
+
+  response$ = pYN;
+  basPrint(response$);
+  processResponse();
+  inputtbox.focus();
+  return false;
+}
+
 function checkEnter(tbox)
 {
   var characterCode;
