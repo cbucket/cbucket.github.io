@@ -1,0 +1,52 @@
+<!doctype html>
+<html>
+<!--dailylog date generator, Ben Grimer 08/03/23-->
+<!--This program generates a date header for use with the daily log-->
+<!--08/03/23 - v1.0-->
+
+<title>dailylog date generator</title>
+<script>
+const weekday = ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
+
+// copied from ccgi project (treadmill.js)
+// slightly modified to provide heading for daily log
+function dateDDMMYY(date) {
+  var day;
+
+  if (null == date) {
+    day = new Date(); // i.e. today
+  } else {
+    day = date;       // or date passed in
+  }
+  var dayOfMonth = ('0' + day.getDate()).slice(-2);
+  var numMonth = ('0' + (day.getMonth()+1).toString()).slice(-2);
+  y2 = ("" + day.getFullYear()).slice(-2);
+  return (dayOfMonth + "-" + numMonth + "-" + y2 );
+}
+
+function init() {
+
+  var x = document.getElementById(_id1);
+  _id1.innerHTML = "Ben Grimer is the greatest!";
+  var today = new Date()
+  var tomorrow = new Date();
+  tomorrow.setDate(tomorrow.getDate()+1);
+  dow = weekday[today.getDay()]
+  dow2 = weekday[tomorrow.getDay()]
+  _id1.innerHTML = "<b><u>" + dateDDMMYY(today) + "</b></u>&nbsp;(" + dow + ")";
+  _id2.innerHTML = "<b><u>" + dateDDMMYY(tomorrow) + "</b></u>&nbsp;(" + dow2 + ")";
+}
+
+</script>
+</head>
+<body onload="init()">
+<p>This program generates today's date for use with the daily log
+<small>(Ben Grimer Mar 2023)</small>
+</p>
+
+<div id="_id1"></div>
+<br><br><br><br><br><br><br>
+<div id="_id2"></div>
+<br>
+</body>
+</html>
