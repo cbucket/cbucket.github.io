@@ -1,11 +1,14 @@
 <!doctype html>
 <html>
 <!-- comma_in_clause, Ben Grimer 11/02/20 -->
+<!-- v1.1 04/50/24 - optional quotes and variable columns added) -->
 <!-- This program converts a list of values for use in a SQL in clause -->
 
 <head>
-<title>Comma Columns</title>
-<link rel="stylesheet" href="/static/css/table_layout.css" type="text/css">
+<link rel="icon" href="data:,">
+<title>Comma In Clause</title>
+<!-- bit below not used (04/05/24) - commented out until I can figure out why it is here -->
+<!-- link rel="stylesheet" href="/static/css/table_layout.css" type="text/css" -->
 <style>
 span.head { font-size:150%; }
 span.small { font-size:75%; }
@@ -20,21 +23,38 @@ var out_ary = [];											// used to populate text area pretty print
 //var numcol = 0;
 //var colmax = [];    										// hold max length of string per column
 
+// ###################################################
+String.prototype.format = function() {
+    var formatted = this;
+    for (var i = 0; i < arguments.length; i++) {
+        var regexp = new RegExp('\\{'+i+'\\}', 'gi');
+        formatted = formatted.replace(regexp, arguments[i]);
+    }
+    return formatted;
+};
+
 // ****************************************
 function generate_table()
 {
   var _orig_message   = document.getElementById('orig_message').value;
   var _output_message = document.getElementById("output_message");
+  var _use_quotes = document.getElementById("quotes1").checked;
+  var _no_cols = document.getElementById("noCols").value;
 
+// console.log("value of _use_quotes is {0}.\nNumber of columns is: {1}.".format(_use_quotes, _no_cols));
+
+  var quoteChar = (_use_quotes) ? "'" : "";
   var line_ary = _orig_message.split("\n");
   out_ary = [];
 
   out_ary.push("(");
-  for (i=0; i<line_ary.length; i++) {								// on 2nd pass format based on max column sizes
+  for (i1=0; i1<line_ary.length; i1++) {								// on 2nd pass format based on max column sizes
 
-    if (i>0) { out_ary.push(","); }
-    out_ary.push("'" + line_ary[i] + "'\n");
-
+    if (i1>0) {
+      if ( 0== i1%_no_cols ) { out_ary.push("\n"); }
+      out_ary.push(",");
+    }
+    out_ary.push(quoteChar + line_ary[i1] + quoteChar );
   }
   _output_message.value = out_ary.join("") + ")\n"
 
@@ -45,6 +65,7 @@ function generate_table()
 <body>
 <p>
 This page will convert a list of inputs to a SQL fragment suitable for use with an SQL in clause. It assumes that the entries are strings.
+<small>(v1.1 04/05/24 - optional quotes and variable columns added)</small>
 </p>
 
 <br>
@@ -75,8 +96,11 @@ string values to convert to IN CLAUSE<br>
 00215e7c-6325-0000-0000-000000000000
 001a64ef-b944-0000-0000-000000000000</textarea>
 
-<br/><input TYPE="button" value="generate IN clause" onclick="generate_table();" /><br><br>
- 
+<br/><input TYPE="button" value="generate IN clause" onclick="generate_table();" />
+<input type="checkbox" id="quotes1" value="quotes1" checked>Add quotes?&nbsp;
+<input type="text" size=1 id="noCols" value="1"/>&nbsp;No. of Columns?
+<br><br>
+
 <div class="sqltext" id="html_out">In clause will appear here ...</div>
 
 <textarea rows="12" cols="160" class="cool" id="output_message">generated in clause will appear here ...</textarea>
@@ -86,3 +110,4 @@ string values to convert to IN CLAUSE<br>
 </body>
 
 </html>
+
