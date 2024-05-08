@@ -1,0 +1,198 @@
+<!doctype html>
+<html>
+<!-- a2_fact_transaction_properties_trans.html, Ben Grimer 08/05/24 -->
+<!-- This program takes a json properties record (from the table a2_fact_transactions (analytics db) -->
+<!-- adds back the the keywords (based on the information in the Anserv Documentation -->
+<!-- 08/05/24 - v0.01 - draft version -->
+<!--      BUG - currently the transform_trace function below is a bit limited as it globally replaces -->
+<!--            all instances of the matched keys but this results in recursive replacements which corrupts -->
+<!--            other non-related cases (and basically just messes with the text -->
+<head>
+<style>
+span.head { font-size:150%; }
+span.small { font-size:75%; }
+div.cool { font-family: courier new; border: 1px solid black; padding: 10px; background:#eef; margin: 10px 0px; }
+</style>
+
+<title>a2 tran properties transform</title>
+<script>
+
+//var myKeywords = {"mName": "method name"
+//  , "dmy": "day / month / year"
+//  ,"op": "operator"
+//  ,"pType": "promotion type"
+//  ,"slpc": "serve limit per customer"
+//  ,"slpp": "serve limit per promotion"
+//  ,"slps": "serve limit per store"
+//  ,"pV": "promotion value"
+//  ,"tV": "transaction value"};
+
+var myKeywords = {"rn" : "Receipt No"
+  ,"sn" : "Trx. Seq. No"
+  ,"cu" : "currency id (in a2_currencies)"
+  ,"op" : "employee id (in a2_employees)"
+  ,"sc" : "Trx short code"
+  ,"na" : "Net Amount"
+  ,"ga" : "Grand Amount"
+  ,"di" : "discount - Total saving"
+  ,"tx" : "Tax"
+  ,"la" : "Loyalty account"
+  ,"ci" : "Customer Id"
+  ,"ch" : "Customer hash token"
+  ,"chs" : "Customer hash tokens"
+  ,"pt" : "Payment token (e.g. verifone token)"
+  ,"no" : "New OptIn (true if first optin)"
+  ,"eo" : "Entered OptIn (This is what was sent by client)"
+  ,"lo" : "Latch OptIn (Once true then stays as true)"
+  ,"ea" : "Email address"
+  ,"of" : "Offset in the transaction_time"
+  ,"tb" : "Transaction-based brand"
+  ,"zn" : "Zone"
+  ,"it" : "List of sale item summary"
+  ,"rt" : "List of return item summary"
+  ,"te" : "List of tenders summary"
+  ,"sys" : "System related info such as RTT"
+/* stuff in items arrays */
+  ,"i": "item_id"
+  ,"q": "quantity"
+  ,"s": "sequence_no"
+  ,"a": "extended_amount"
+  ,"d": "discount_amount"
+};
+
+// ***************************************************************************************
+// function to hide/show element identified by _id tag (taken from supportal_common.js)
+function hideShow(_id) {
+  var x = document.getElementById(_id);
+  if (x.style.display === "none") {
+    x.style.display = "block";
+  } else {
+    x.style.display = "none";
+  }
+}
+
+// ***************************************************************************************
+function init() {
+//  console.log('init called ...');
+  var _tmp_ary = [];
+    _tmp_ary.push("transform keys below:");
+  for (var key in myKeywords) {
+    _tmp_ary.push("key >" + key + "<. Value >" + myKeywords[key] + "<.");
+  }
+  document.getElementById("aboutDIV").innerHTML = _tmp_ary.join("<br>");
+//alert(_tmp_ary.join("<br>"));
+}
+
+// ***************************************************************************************
+function transform_trace()
+{
+  var _orig_message   = document.getElementById('orig_message').value;
+  var _output_message = document.getElementById("output_message");
+
+  for (var key in myKeywords) {
+    _orig_message = _orig_message.split(key).join(myKeywords[key]);
+  }
+  _output_message.value = _orig_message;
+}
+
+</script>
+</head>
+<body onload="init()">
+<p>This program takes an MCORE tracelog in the keyword substituted format and then adds back the the keywords (03/09/19-v1.2)<br/>
+<small>(Ben Grimer May 2024)</small>
+</p>
+
+<br>
+Paste a2_fact_transaction properties json element in place of example below:<br>
+<textarea rows="12" cols="160" class="cool" id="orig_message">
+{
+    "rn": "02750003036352405061256081",
+    "sn": 3635,
+    "cu": 2,
+    "op": 34,
+    "sc": "",
+    "na": 0,
+    "ga": -2.10,
+    "di": 2.10,
+    "tx": 0,
+    "pt": "F179136237477876",
+    "no": false,
+    "eo": false,
+    "lo": false,
+    "of": "Z",
+    "tb": "",
+    "zn": "",
+    "it":
+    [
+        {
+            "i": 1120511,
+            "q": 1,
+            "s": 3,
+            "a": 1.00
+        },
+        {
+            "i": 1389169,
+            "q": 1,
+            "s": 4,
+            "a": 20.00
+        },
+        {
+            "i": 1235473,
+            "q": 1,
+            "s": 5,
+            "a": 0
+        }
+    ],
+    "rt":
+    [
+        {
+            "i": 1389169,
+            "q": 1,
+            "s": 1,
+            "a": -20.00
+        },
+        {
+            "i": 1120511,
+            "q": 1,
+            "s": 2,
+            "a": -1.00
+        }
+    ],
+    "te":
+    [
+        {
+            "i": 965,
+            "s": 7,
+            "a": 2.10,
+            "m": "****** **** 6848",
+            "c": "unknown",
+            "pts":
+            {
+                "pan": "F179136237477876",
+                "par": "",
+                "fis": "F179136237477876"
+            }
+        }
+    ],
+    "sys":
+    {
+        "rtt": 174.0
+    }
+}
+</textarea>
+<br/>
+
+<input TYPE="button" value="Transform" onclick="transform_trace();" />
+&nbsp;<span onclick="hideShow('aboutDIV');"><i><u>Show transform key</u></i></span><br>
+<div id="aboutDIV" style="display: none;color: red;">key info shown here</div>
+
+<br>
+<div class="heading"><u>Results shown below</u></div>
+<br/>
+
+<textarea rows="12" cols="160" class="cool" id="output_message">translated trace log will appear here ..</textarea>
+
+ <br><br>
+
+</body>
+</html>
