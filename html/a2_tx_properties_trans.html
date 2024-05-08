@@ -4,60 +4,67 @@
 <!-- This program takes a json properties record (from the table a2_fact_transactions (analytics db) -->
 <!-- adds back the the keywords (based on the information in the Anserv Documentation -->
 <!-- 08/05/24 - v0.01 - draft version -->
-<!--      BUG - currently the transform_trace function below is a bit limited as it globally replaces -->
-<!--            all instances of the matched keys but this results in recursive replacements which corrupts -->
-<!--            other non-related cases (and basically just messes with the text -->
+
 <head>
+<link rel="icon" href="data:,">
 <style>
 span.head { font-size:150%; }
 span.small { font-size:75%; }
 div.cool { font-family: courier new; border: 1px solid black; padding: 10px; background:#eef; margin: 10px 0px; }
 </style>
-
 <title>a2 tran properties transform</title>
 <script>
 
-//var myKeywords = {"mName": "method name"
-//  , "dmy": "day / month / year"
-//  ,"op": "operator"
-//  ,"pType": "promotion type"
-//  ,"slpc": "serve limit per customer"
-//  ,"slpp": "serve limit per promotion"
-//  ,"slps": "serve limit per store"
-//  ,"pV": "promotion value"
-//  ,"tV": "transaction value"};
-
 var myKeywords = {"rn" : "Receipt No"
   ,"sn" : "Trx. Seq. No"
-  ,"cu" : "currency id (in a2_currencies)"
-  ,"op" : "employee id (in a2_employees)"
+  ,"cu" : "currency id"                  // in a2_currencies
+  ,"op" : "employee id"                  // in a2_employees
   ,"sc" : "Trx short code"
   ,"na" : "Net Amount"
   ,"ga" : "Grand Amount"
-  ,"di" : "discount - Total saving"
+  ,"di" : "discount"                     // Total saving
   ,"tx" : "Tax"
   ,"la" : "Loyalty account"
   ,"ci" : "Customer Id"
   ,"ch" : "Customer hash token"
   ,"chs" : "Customer hash tokens"
-  ,"pt" : "Payment token (e.g. verifone token)"
-  ,"no" : "New OptIn (true if first optin)"
-  ,"eo" : "Entered OptIn (This is what was sent by client)"
-  ,"lo" : "Latch OptIn (Once true then stays as true)"
+  ,"pt" : "payment token"                // (e.g. verifone token)
+  ,"no" : "New OptIn"                    // (true if first optin)"
+  ,"eo" : "Entered OptIn"                // (This is what was sent by client)
+  ,"lo" : "Latch OptIn"                  // (Once true then stays as true)
   ,"ea" : "Email address"
-  ,"of" : "Offset in the transaction_time"
+  ,"of" : "transaction time Offset"      // Offset in the transaction_time
   ,"tb" : "Transaction-based brand"
   ,"zn" : "Zone"
-  ,"it" : "List of sale item summary"
-  ,"rt" : "List of return item summary"
-  ,"te" : "List of tenders summary"
-  ,"sys" : "System related info such as RTT"
-/* stuff in items arrays */
-  ,"i": "item_id"
+  ,"it" : "sale_items"                    // List of sale item summary
+  ,"rt" : "return_items"                  // List of return item summary
+  ,"te" : "tenders"                       // tenders summary
+  ,"sys" : "system related"               // System related info such as RTT
+
+  ,"i": "item_id"                         // stuff in items arrays
   ,"q": "quantity"
   ,"s": "sequence_no"
-  ,"a": "extended_amount"
+  ,"a": "amount"
   ,"d": "discount_amount"
+
+  ,"m": "MaskedPan"                       // stuff in misc. other arrays
+  ,"e": "Expiration date"
+  ,"pts": "Payment Tokens"                // Payment token Key-Value pairs
+  ,"pan": "PAN token"
+  ,"par": "PAR token"
+  ,"fis": "FIS token"
+  ,"vfn": "Verifone token"
+  ,"c": "authorization code"              // Authorization code (for UNIQLO CRM; e.g., 77104D)
+};
+
+// ###################################################
+String.prototype.format = function() {
+    var formatted = this;
+    for (var i = 0; i < arguments.length; i++) {
+        var regexp = new RegExp('\\{'+i+'\\}', 'gi');
+        formatted = formatted.replace(regexp, arguments[i]);
+    }
+    return formatted;
 };
 
 // ***************************************************************************************
@@ -91,6 +98,22 @@ function transform_trace()
 
   for (var key in myKeywords) {
     _orig_message = _orig_message.split(key).join(myKeywords[key]);
+  }
+  _output_message.value = _orig_message;
+}
+
+// ***************************************************************************************
+function transform_trace2()
+{
+  var _orig_message   = document.getElementById('orig_message').value;
+  var _output_message = document.getElementById("output_message");
+
+  for (var key in myKeywords) {
+    key2='"' + key + '"';
+
+    console.log("key=>{0}<".format(key2) );
+
+    _orig_message = _orig_message.split('"' + key + '"').join('"' + myKeywords[key] + '"');
   }
   _output_message.value = _orig_message;
 }
@@ -182,7 +205,7 @@ Paste a2_fact_transaction properties json element in place of example below:<br>
 </textarea>
 <br/>
 
-<input TYPE="button" value="Transform" onclick="transform_trace();" />
+<input TYPE="button" value="Transform" onclick="transform_trace2();" />
 &nbsp;<span onclick="hideShow('aboutDIV');"><i><u>Show transform key</u></i></span><br>
 <div id="aboutDIV" style="display: none;color: red;">key info shown here</div>
 
