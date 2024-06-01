@@ -33,6 +33,7 @@ function generate_table()
   var _orig_message   = document.getElementById('orig_message').value;
   var _output_message = document.getElementById("output_message");
   var _deleteRedundantFields = document.getElementById("delRed").checked;
+  var _projName = document.getElementById("projName").value;
   var _note = document.getElementById("note").value;
   
   projTemplate = JSON.parse(_orig_message)
@@ -40,6 +41,7 @@ function generate_table()
 //  console.log("value of note is {0}\n".format(projTemplate.jobs[0].note));
 //  console.log("delred is >{0}<".format(_deleteRedundantFields) );
 
+  projTemplate.projectName = _projName;
   projTemplate.jobs[0].note = _note;
   
   if (_deleteRedundantFields) {
