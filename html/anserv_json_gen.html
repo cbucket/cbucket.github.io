@@ -1,0 +1,299 @@
+<!doctype html>
+<!-- anserv_json_gen, Ben Grimer 01/06/24 -->
+<!-- v1.0 04/50/24 - generate an Anserv project JSON record suitable for being POSTed to an Anserv endpoint. -->
+
+<head>
+<link rel="icon" href="data:,">
+<title>Anserv JSON gen</title>
+<style>
+span.head { font-size:150%; }
+span.small { font-size:75%; }
+
+div.cool { font-family: courier new; border: 1px solid black; padding: 10px; background:#eef; margin: 10px 0px; }
+
+</style>
+<script>
+
+var projTemplate = {};
+var out_ary = [];											// used to populate text area pretty print
+
+// ###################################################
+String.prototype.format = function() {
+    var formatted = this;
+    for (var i = 0; i < arguments.length; i++) {
+        var regexp = new RegExp('\\{'+i+'\\}', 'gi');
+        formatted = formatted.replace(regexp, arguments[i]);
+    }
+    return formatted;
+};
+
+// ****************************************
+function generate_table()
+{
+  var _orig_message   = document.getElementById('orig_message').value;
+  var _output_message = document.getElementById("output_message");
+  var _deleteRedundantFields = document.getElementById("delRed").checked;
+  var _note = document.getElementById("note").value;
+  
+  projTemplate = JSON.parse(_orig_message)
+
+//  console.log("value of note is {0}\n".format(projTemplate.jobs[0].note));
+//  console.log("delred is >{0}<".format(_deleteRedundantFields) );
+
+  projTemplate.jobs[0].note = _note;
+  
+  if (_deleteRedundantFields) {
+	delete projTemplate.jobs[0].jobUuid;
+	delete projTemplate.jobs[0].jobInstanceUuid;
+    projTemplate.jobs[0].lastState.status = {};
+  }
+
+  _output_message.value = JSON.stringify(projTemplate, null, 2); // Indented 2 spaces
+
+
+}
+</script>
+</head>
+
+<body>
+<p>
+This page will generate an Anserv project JSON record suitable for being POSTed to an Anserv endpoint.<br>
+<small>(v1.0 01/06/24 - Ben Grimer)</small>
+</p>
+
+<br>
+Template Project JSON<br>
+<textarea rows="12" cols="160" class="cool" id="orig_message">{
+    "projectName": "rep automated-store-hierarchy(Redshift)",
+    "version": 1,
+    "jobs": [
+        {
+            "name": "job rep-automated-store-hierarchy",
+            "type": "SCHEDULED_ETL",
+            "dataIntegrationComponent": "com.ecrebo.analytics.anserv.worker.plugin.datafeed.FileFeedRoute",
+            "jobUuid": "< new job uuid here>",
+            "jobInstanceUuid": "< new job instance uuid here>",
+            "lastState": {
+                "lastId": 0,
+                "status": {
+                    "lastUuid": "27d3186b-7c9f-45f9-af9e-c04b3084b168",
+                    "lastStat": "OK",
+                    "lastExec": "2024-05-31T01:04:00.134376966Z",
+                    "lastSucc": "2024-05-31T01:04:00.134376966Z",
+                    "recsTdy": 1857049,
+                    "recsTtl": 1617607099,
+                    "succTdy": 1,
+                    "succTtl": 1471,
+                    "errsTdy": 0,
+                    "errsTtl": 0,
+                    "lastDur": 246341,
+                    "lastMsg": "OK"
+                }
+            },
+            "minIntervalMSec": 10000,
+            "tags": [
+                "default"
+            ],
+            "dataIntegrationConfiguration": {
+                "version": 1,
+                "execRoute": {
+                    "connectionPointRefs": {
+                        "archive": "cef3af04-424b-4a79-98b2-f13b1846b5c4",
+                        "metastore": "a2b410c2-95a1-4796-b210-4820bd655859",
+                        "retailerSftp": "cef3af04-424b-4a79-98b2-f13b1846b5c4",
+                        "analytics": "55adbdf0-ee06-438d-9f36-1c5d392df363"
+                    },
+                    "params": {
+                        "archive": {
+                            "connectionPointType": "SFTP",
+                            "destination": {
+                                "cpMetaStoreRefKey": "metastore",
+                                "cpRefKey": "archive",
+                                "remoteDir": "/data/reports/87/automated-store-hierarchy/"
+                            },
+                            "fileType": "GZIP"
+                        },
+                        "check": {
+                            "content": "LINE_COUNT",
+                            "extension": "chk",
+                            "feed": false
+                        },
+                        "done": {
+                            "extension": "done",
+                            "feed": false
+                        },
+                        "extract": {
+                            "chunkSize": 10000,
+                            "comment": "N/A",
+                            "cpRefKey": "analytics",
+                            "dataFileName": "automated-store-hierarchy.txt",
+                            "delimiter": "TAB",
+                            "description": "ECR-4990 Audience Builder - automated store hierarchy from anserv",
+                            "escapeDelimiter": false,
+                            "fields": [
+                                {
+                                    "comment": "",
+                                    "dataType": "TEXT",
+                                    "description": "str number",
+                                    "fieldName": "str_number",
+                                    "format": null,
+                                    "include": true,
+                                    "maxByteLength": 255,
+                                    "rsKey": "str_number",
+                                    "typicalValue": "0"
+                                },
+                                {
+                                    "comment": "",
+                                    "dataType": "TEXT",
+                                    "description": "first date",
+                                    "fieldName": "first_date",
+                                    "format": null,
+                                    "include": true,
+                                    "maxByteLength": 255,
+                                    "rsKey": "first_date",
+                                    "typicalValue": "0"
+                                },
+                                {
+                                    "comment": "",
+                                    "dataType": "TEXT",
+                                    "description": "last date",
+                                    "fieldName": "last_date",
+                                    "format": null,
+                                    "include": true,
+                                    "maxByteLength": 255,
+                                    "rsKey": "last_date",
+                                    "typicalValue": "0"
+                                },
+                                {
+                                    "comment": "",
+                                    "dataType": "TEXT",
+                                    "description": "str hier 1",
+                                    "fieldName": "str_hier_1",
+                                    "format": null,
+                                    "include": true,
+                                    "maxByteLength": 255,
+                                    "rsKey": "str_hier_1",
+                                    "typicalValue": "0"
+                                },
+                                {
+                                    "comment": "",
+                                    "dataType": "TEXT",
+                                    "description": "str hier 2",
+                                    "fieldName": "str_hier_2",
+                                    "format": null,
+                                    "include": true,
+                                    "maxByteLength": 255,
+                                    "rsKey": "str_hier_2",
+                                    "typicalValue": "0"
+                                },
+                                {
+                                    "comment": "",
+                                    "dataType": "TEXT",
+                                    "description": "str hier 3",
+                                    "fieldName": "str_hier_3",
+                                    "format": null,
+                                    "include": true,
+                                    "maxByteLength": 255,
+                                    "rsKey": "str_hier_3",
+                                    "typicalValue": "0"
+                                },
+                                {
+                                    "comment": "",
+                                    "dataType": "TEXT",
+                                    "description": "str hier 4",
+                                    "fieldName": "str_hier_4",
+                                    "format": null,
+                                    "include": true,
+                                    "maxByteLength": 255,
+                                    "rsKey": "str_hier_4",
+                                    "typicalValue": "0"
+                                },
+                                {
+                                    "comment": "",
+                                    "dataType": "TEXT",
+                                    "description": "str hier 5",
+                                    "fieldName": "str_hier_5",
+                                    "format": null,
+                                    "include": true,
+                                    "maxByteLength": 255,
+                                    "rsKey": "str_hier_5",
+                                    "typicalValue": "0"
+                                },
+                                {
+                                    "comment": "",
+                                    "dataType": "TEXT",
+                                    "description": "str hier 6",
+                                    "fieldName": "str_hier_6",
+                                    "format": null,
+                                    "include": true,
+                                    "maxByteLength": 255,
+                                    "rsKey": "str_hier_6",
+                                    "typicalValue": "0"
+                                },
+                                {
+                                    "comment": "",
+                                    "dataType": "INTEGER",
+                                    "description": "retailer id",
+                                    "fieldName": "retailer_id",
+                                    "format": null,
+                                    "include": true,
+                                    "maxByteLength": 255,
+                                    "rsKey": "retailer_id",
+                                    "typicalValue": "0"
+                                }
+                            ],
+                            "header": true,
+                            "lineBreak": "LF",
+                            "nonAsciiHandling": "NORMALISE_REMOVE",
+                            "queryString": "select\n str_number,first_date::text,last_date::text,str_hier_1,str_hier_2,str_hier_3,str_hier_4,str_hier_5,str_hier_6,retailer_id::text\n from (\n select\n st.original_id as str_number\n ,null as first_date\n ,null as last_date\n ,'All' as str_hier_1\n \n ,case\n when (\n st.properties->>'country' in ('UK','IE','GB')\n or right(st.original_id,2) in ('UK','IE','GB')\n )\n then 'UK&I'\n else 'CE'\n end as str_hier_2\n ,case\n when\n (case\n when st.properties->>'country' ='' then right(st.original_id,2)\n else st.properties->>'country'\n end)\n ='UK' then 'GB'\n else\n (case\n when st.properties->>'country' ='' then right(st.original_id,2)\n else st.properties->>'country'\n end)\n end\n as str_hier_3\n ,case\n when till.properties->>'terminalType'='WEB' then 'Online'\n when till.properties->>'terminalType'='POS' then 'Instore'\n else till.properties->>'terminalType'\n end as str_hier_4\n ,st.original_id as str_hier_5\n ,null as str_hier_6\n ,st.retailer_id\n ,row_number() over (partition by st.original_id) as row_num\n from a2_stores st\n join a2_terminals till on st.id=till.a2_store_id\n ) t1\n where row_num=1\n limit 10\n",
+                            "queryType": "CUSTOM",
+                            "removeLineBreak": true,
+                            "unescape": "XML_UNESCAPE"
+                        },
+                        "feed": {
+                            "connectionPointType": "SFTP",
+                            "destination": {
+                                "cpMetaStoreRefKey": "metastore",
+                                "cpRefKey": "retailerSftp",
+                                "remoteDir": "/data/reports/87/automated-store-hierarchy/s3/"
+                            },
+                            "extension": "txt",
+                            "fileType": "RAW"
+                        }
+                    }
+                }
+            },
+            "schedules": [
+                {
+                    "frequencyType": "HOURLY",
+                    "targetPeriodType": "PREVIOUS_HOUR",
+                    "startScheduledTime": "2024-05-31T16:05:00+01:00[Europe/London]",
+                    "endScheduledTime": "2024-05-31T19:05:00+01:00[Europe/London]",
+                    "marginInMin": 60,
+                    "startOfWeek": "SUN"
+                }
+            ],
+            "note": "n/a"
+        }
+    ]
+}</textarea>
+
+<!-- <input type="checkbox" id="quotes1" value="quotes1" checked>Add quotes?&nbsp;
+<input type="text" size=1 id="noCols" value="1"/>&nbsp;No. of Columns?  -->
+<br><input type="text" size=100 id="projName" value="Put new project name here..."/>&nbsp;New Project Name
+<br><input type="text" size=100 id="note" value="Put ECR reference here..."/>&nbsp;New Note
+<br><input type="checkbox" id="delRed" value="delred" checked>Delete Redundant fields?&nbsp;
+
+<br/><input TYPE="button" value="generate JSON" onclick="generate_table();" />
+
+<br><br>
+
+<div class="sqltext" id="html_out">In clause will appear here ...</div>
+
+<textarea rows="12" cols="160" class="cool" id="output_message">generated Project JSON record will appear here ...</textarea>
+
+ <br><br>
+ 
+</body>
+</html>
+
