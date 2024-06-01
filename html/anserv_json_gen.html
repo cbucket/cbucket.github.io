@@ -41,8 +41,8 @@ function generate_table()
 //  console.log("value of note is {0}\n".format(projTemplate.jobs[0].note));
 //  console.log("delred is >{0}<".format(_deleteRedundantFields) );
 
-  projTemplate.projectName = _projName;
-  projTemplate.jobs[0].note = _note;
+  if (_projName != "") { projTemplate.projectName = _projName; }
+  if (_note != "")     { projTemplate.jobs[0].note = _note; }
   
   if (_deleteRedundantFields) {
 	delete projTemplate.jobs[0].jobUuid;
@@ -282,8 +282,8 @@ Template Project JSON<br>
 
 <!-- <input type="checkbox" id="quotes1" value="quotes1" checked>Add quotes?&nbsp;
 <input type="text" size=1 id="noCols" value="1"/>&nbsp;No. of Columns?  -->
-<br><input type="text" size=100 id="projName" value="Put new project name here..."/>&nbsp;New Project Name
-<br><input type="text" size=100 id="note" value="Put ECR reference here..."/>&nbsp;New Note
+<br><input type="text" size=80 id="projName" value=""/>&nbsp;New Project Name
+<br><input type="text" size=80 id="note" value=""/>&nbsp;New Note
 <br><input type="checkbox" id="delRed" value="delred" checked>Delete Redundant fields?&nbsp;
 
 <br/><input TYPE="button" value="generate JSON" onclick="generate_table();" />
