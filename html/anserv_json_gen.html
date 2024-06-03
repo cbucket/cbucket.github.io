@@ -57,6 +57,22 @@ function generate_table()
 
 
 }
+
+// ****************************************
+function toggleSQL()
+{
+  var _sql = document.getElementById("sql").value;
+
+  if (-1 != _sql.indexOf("\\n") ) {             // if its got backslash n's the add newline
+    _tmpstr = _sql.replace(/\\n/g, '\n');
+  } else {										// or vice-versa
+    _tmpstr = _sql.replace(/\n/g, '\\n');
+  }
+//  console.log("_tmpstr is >{0}<".format(_tmpstr) );
+  
+  document.getElementById("sql").value = _tmpstr;
+}
+
 </script>
 </head>
 
@@ -67,7 +83,7 @@ This page will generate an Anserv project JSON record suitable for being POSTed 
 </p>
 
 Template Project JSON<br>
-<textarea rows="12" cols="160" class="cool" id="orig_message">{
+<textarea rows="12" cols="100" class="cool" id="orig_message">{
     "projectName": "rep automated-store-hierarchy(Redshift)",
     "version": 1,
     "jobs": [
@@ -283,7 +299,7 @@ Template Project JSON<br>
 }</textarea>
 <br><input type="text" size=80 id="projName" value=""/>&nbsp;New Project Name
 <br><input type="text" size=80 id="note" value=""/>&nbsp;New Note
-<br>Amended SQL queryString<br>
+<br>Amended SQL queryString&nbsp;<input TYPE="button" value="toggle SQL" onclick="toggleSQL();" /><br>
 <textarea rows="4" cols="80" class="cool" id="sql"></textarea>
 <br><input type="checkbox" id="delRed" value="delred" checked>Delete Redundant fields?&nbsp;
 
@@ -293,7 +309,7 @@ Template Project JSON<br>
 
 <div class="sqltext" id="html_out">In clause will appear here ...</div>
 
-<textarea rows="12" cols="160" class="cool" id="output_message">generated Project JSON record will appear here ...</textarea>
+<textarea rows="12" cols="100" class="cool" id="output_message">generated Project JSON record will appear here ...</textarea>
 
 
 <br><br>
