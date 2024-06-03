@@ -7,6 +7,11 @@ at various times.
 
 ## The Tools
 
+### anserv_json_gen.html
+Used to manipulate anserv manifests - large json structures containing the
+details of anserv projects/jobs. Written following some manual editing of
+an initial test case for JIRA ticket ECR-4990.
+
 ### comma_columns.html
 This page generates prettyfied column output similar to the output 
 produced by the psql terminal application.
