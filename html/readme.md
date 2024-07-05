@@ -39,6 +39,9 @@ copy the result.
 ### onetimepad.html
 Simple html/javascript implementation of a onetimepad encryption.
 
+### toggle_sql.html
+Simple form to allow conversion of single-line \n delimited SQL to multi-line.
+
 ### tracelog_trans.html
 This program takes an MCORE tracelog in the keyword substituted format and then
 adds back the the keywords (based on the list provided by RichardE on 05/07/19)
