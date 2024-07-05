@@ -39,7 +39,7 @@ copy the result.
 ### onetimepad.html
 Simple html/javascript implementation of a onetimepad encryption.
 
-### toggle_sql.html
+### [toggle_sql.html](toggle_sql.html)
 Simple form to allow conversion of single-line \n delimited SQL to multi-line.
 
 ### tracelog_trans.html
