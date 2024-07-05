@@ -1,0 +1,65 @@
+<!doctype html>
+<!-- toggle_sql, Ben Grimer 03/07/24 -->
+<!-- v0.1 03/07/24 - simple form to allow conversion of single-line \n delimited SQL to multi-line. -->
+
+<head>
+<link rel="icon" href="data:,">
+<title>Anserv JSON gen</title>
+<style>
+span.head { font-size:150%; }
+span.small { font-size:75%; }
+
+div.cool { font-family: courier new; border: 1px solid black; padding: 10px; background:#eef; margin: 10px 0px; }
+
+</style>
+<script>
+
+// ###################################################
+String.prototype.format = function() {
+    var formatted = this;
+    for (var i = 0; i < arguments.length; i++) {
+        var regexp = new RegExp('\\{'+i+'\\}', 'gi');
+        formatted = formatted.replace(regexp, arguments[i]);
+    }
+    return formatted;
+};
+
+// ****************************************
+function toggleSQL()
+{
+  var _sql = document.getElementById("sql").value;
+
+  if (-1 != _sql.indexOf("\\n") ) {             // if its got backslash n's the add newline
+    _tmpstr = _sql.replace(/\\n/g, '\n');
+  } else {										// or vice-versa
+    _tmpstr = _sql.replace(/\n/g, '\\n');
+  }
+//  console.log("_tmpstr is >{0}<".format(_tmpstr) );
+  
+  document.getElementById("sql").value = _tmpstr;
+}
+
+</script>
+</head>
+
+<body>
+<p>
+This simple form allows SQL to be switched between single-line (\n delimited) format and multi-line
+format. Use cases for this are:
+</p>
+
+(a) take a supportal SQL template and reformat it for use in Navicat<br>
+
+(b) Same with SQL taken from a project JSON entry and use with Navicat.<br>
+<br>
+<small>(v0.1 03/07/24 - Ben Grimer)</small>
+<br><br>
+
+SQL queryString&nbsp;&nbsp;&nbsp;<input TYPE="button" value="toggle SQL" onclick="toggleSQL();" /><br><br>
+<textarea rows="10" cols="80" class="cool" id="sql">
+this\nis\na\ntest\n
+</textarea>
+<br><br>
+</body>
+</html>
+
