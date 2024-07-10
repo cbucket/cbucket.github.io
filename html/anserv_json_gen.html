@@ -48,11 +48,13 @@ function generate_table()
   }
   
   if (_deleteRedundantFields) {
-	delete projTemplate.jobs[0].jobUuid;
-	delete projTemplate.jobs[0].jobInstanceUuid;
+    delete projTemplate.jobs[0].jobUuid;
+    delete projTemplate.jobs[0].jobInstanceUuid;
+	  delete projTemplate.projectUuid;                      // added: 10/07/24
+	  delete projTemplate.projectInstanceUuid;              // ditto
+
     projTemplate.jobs[0].lastState.status = {};
   }
-
   _output_message.value = JSON.stringify(projTemplate, null, 2); // Indented 2 spaces
 
 
