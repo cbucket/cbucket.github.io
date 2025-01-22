@@ -32,6 +32,35 @@ String.prototype.format = function() {
     return formatted;
 };
 
+// ###################################################
+// copied from bookmarks3.php
+// this is a callback function which populates the
+// local storage bookmark json object
+function loadStorageFromString(_xmlResponse)
+{
+  var _iAry = _xmlResponse.split("\n");
+  var mainAry = [];
+  entry = false;
+
+  for (_line of _iAry) {
+    if (_line.length > 0) {                        // ignore blank lines
+      if (_line.search(',') == -1) {               // if heading
+        if (entry) { mainAry.push(entry); }
+        entry = {};
+        entry.heading = _line;
+        entry.links = [];
+      } else {                                     // if link
+        if (entry) { entry.links.push(_line); }
+      }
+    }
+  }
+  mainAry.push(entry);
+  localStorage.setItem("bookmarks2", JSON.stringify(mainAry));
+
+  // also populate the global variable
+  gBookmarksJSON = mainAry;
+}
+
 // ****************************************
 function generate_table()
 {
@@ -46,15 +75,41 @@ function generate_table()
   var line_ary = _orig_message.split("\n");
   out_ary = [];
 
-  out_ary.push("(");
-  for (i1=0; i1<line_ary.length; i1++) {								// on 2nd pass format based on max column sizes
+  out_ary.push("[\n");
 
-    if (i1>0) {
-      if ( 0== i1%_no_cols ) { out_ary.push("\n"); }
-      out_ary.push(",");
+//  for (i1=0; i1<line_ary.length; i1++) {								// on 2nd pass format based on max column sizes
+
+//    console.log("line>{0}<.".format(line_ary[i1]) );
+    // uptohere
+////    if (i1>0) {
+////      if ( 0== i1%_no_cols ) { out_ary.push("\n"); }
+////      out_ary.push(",");
+////    }
+////    out_ary.push(quoteChar + line_ary[i1] + quoteChar );
+//    out_ary.push("  {0}\n".format( line_ary[i1]));
+//  }
+
+  entry = false;
+//  for (_line of _iAry) {
+  for (_line of line_ary) {
+    console.log("line>{0}<.".format(_line) );
+    if (_line.length > 0) {                        // ignore blank lines
+      if (_line.search(',') == -1) {               // if heading
+        if (entry) { out_ary.push(entry); }
+        entry = {};
+        entry.heading = _line;
+        entry.links = [];
+      } else {                                     // if link
+        if (entry) { entry.links.push(_line); }
+      }
     }
-    out_ary.push(quoteChar + line_ary[i1] + quoteChar );
   }
+  out_ary.push(entry);
+  console.log(JSON.stringify(out_ary));
+
+
+
+
   _output_message.value = out_ary.join("") + ")\n"
 
 }
