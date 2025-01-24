@@ -36,6 +36,7 @@ String.prototype.format = function() {
 // copied from bookmarks3.php
 // this is a callback function which populates the
 // local storage bookmark json object
+/*
 function loadStorageFromString(_xmlResponse)
 {
   var _iAry = _xmlResponse.split("\n");
@@ -60,9 +61,11 @@ function loadStorageFromString(_xmlResponse)
   // also populate the global variable
   gBookmarksJSON = mainAry;
 }
+*/
 
 // ****************************************
 function generate_json_array()
+// based on loadStorageFromString() found in bookmarks3.php
 {
   var _orig_message   = document.getElementById('orig_message').value;
   var _output_message = document.getElementById("output_message");
