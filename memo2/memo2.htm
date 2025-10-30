@@ -305,14 +305,22 @@ for (r = 0; r < rowWidth; r++) {
 </form>
 </center>
 
-<table>
-<tr><td><img src="img/memory_game_box.jpg" alt="original box" height="200"></td>
-<td>
-<a target='_blank' id="rules" href="https://upload.snakesandlattes.com/rules/d/DisneyToyStoryMemory.pdf">Rules</a>
-<br><br>
-<input type="button" value="Show/Hide" name="showall" onClick="ToggleAllTiles()"><br>
-<input type="checkbox" id="removecards" value="remove" CHECKED>remove tiles</input><br>
-<input type="checkbox" id="noshrink" value="noshrink" CHECKED>no shrink</input><br>
+<style type="text/css">
+table.info {
+ 	border: solid black 1px;
+ 	border-spacing: 10px;
+}
+</style>
+
+<table class="info">
+<tr><td>
+  <a href="img/memory_game_box.jpg" target="_blank"><img src="img/memory_game_box.jpg" alt="original box" height="200"/></a>
+</td><td>
+  <a target='_blank' id="rules" href="https://upload.snakesandlattes.com/rules/d/DisneyToyStoryMemory.pdf">Rules</a>
+  <br><br>
+  <input type="button" value="Show/Hide" name="showall" onClick="ToggleAllTiles()"><br>
+  <input type="checkbox" id="removecards" value="remove" CHECKED>remove tiles</input><br>
+  <input type="checkbox" id="noshrink" value="noshrink" CHECKED>no shrink</input><br>
 </td>
 </tr>
 </table>
